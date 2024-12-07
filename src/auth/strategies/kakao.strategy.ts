@@ -14,14 +14,21 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
 
   async validate(accessToken: string, refreshToken: string, profile: Profile) {
     try {
-      const { _json } = profile;
+      const {
+        _json: {
+          id,
+          properties: { profile_image, nickname },
+        },
+      } = profile;
+
       const user = {
-        kakaoID: _json.id.toString(),
-        profile_image: _json.properties.profile_image,
-        name: _json.properties.nickname,
+        kakaoID: id.toString(),
+        profile_image,
+        name: nickname,
       };
       return user;
     } catch (error) {
+      console.debug('Error details: ', error.stack);
       throw new UnauthorizedException();
     }
   }

@@ -17,12 +17,11 @@ export class AuthController {
   @Get('kakao/callback')
   @UseGuards(AuthGuard('kakao'))
   async kakaoCallback(@UserInfo() user, @Res() res: Response) {
-    console.log(user);
     this.authService.findUserElseRegister(
       user.kakaoID,
       user.name,
       user.profile_image,
     );
-    res.redirect('http://localhost:3000');
+    res.redirect('http://localhost:3000'); //이후 변경 필요
   }
 }
