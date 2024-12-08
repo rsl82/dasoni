@@ -9,5 +9,5 @@ export class User extends BaseEntity {
   name: string;
 
   @Column()
-  profile_image: string;
+  profileImage: string;
 }

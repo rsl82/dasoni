@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
@@ -13,12 +13,12 @@ export class UserService {
   async registerKakaoUser(
     kakaoID: string,
     name: string,
-    profile_image: string,
+    profileImage: string,
   ): Promise<User> {
     const user = this.userRepository.create({
       kakaoID,
       name,
-      profile_image,
+      profileImage,
     });
 
     await this.userRepository.save(user);

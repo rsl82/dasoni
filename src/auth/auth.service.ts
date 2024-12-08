@@ -9,7 +9,7 @@ export class AuthService {
   async findUserElseRegister(
     kakaoID: string,
     name: string,
-    profile_image: string,
+    profileImage: string,
   ): Promise<User> {
     const user = await this.userService.findKakaoUser(kakaoID);
 
@@ -17,7 +17,7 @@ export class AuthService {
       return await this.userService.registerKakaoUser(
         kakaoID,
         name,
-        profile_image,
+        profileImage,
       );
     }
     return user;
