@@ -2,8 +2,9 @@ import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from './decorators/user-info.decorator';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { kakaoUserDto } from './dto/kakao-user.dto';
+import { JwtToKakaoID } from './decorators/jwt-to-kakao-id.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -31,6 +32,16 @@ export class AuthController {
       maxAge: 3 * 24 * 60 * 60 * 1000,
     });
 
+    //console log
+    console.log(accessToken);
+
     return res.json({ message: 'Login Success' });
+  }
+
+  @Get('/test')
+  @UseGuards(AuthGuard('jwt'))
+  test(@JwtToKakaoID() kakaoID: string) {
+    console.log(kakaoID);
+    return 'success';
   }
 }
