@@ -6,6 +6,7 @@ import { UserService } from 'src/user/user.service';
 export class AuthService {
   constructor(private readonly userService: UserService) {}
 
+  //카카오 ID를 기반으로 유저를 조회하고 없을 시에는 유저 생성 후 리턴
   async findUserElseRegister(
     kakaoID: string,
     name: string,

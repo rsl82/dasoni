@@ -8,12 +8,14 @@ import { Response } from 'express';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  //카카오 로그인 URL
   @Get('kakao')
   @UseGuards(AuthGuard('kakao'))
   async kakaoAuth(@Req() req: Request) {
     return;
   }
 
+  //로그인 후 callback URL
   @Get('kakao/callback')
   @UseGuards(AuthGuard('kakao'))
   async kakaoCallback(@UserInfo() user, @Res() res: Response) {
