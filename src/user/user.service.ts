@@ -13,12 +13,12 @@ export class UserService {
   async registerKakaoUser(
     kakaoID: string,
     name: string,
-    profile_image: string,
+    profileImage: string,
   ): Promise<User> {
     const user = this.userRepository.create({
       kakaoID,
       name,
-      profile_image,
+      profileImage,
     });
 
     await this.userRepository.save(user);

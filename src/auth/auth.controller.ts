@@ -20,7 +20,7 @@ export class AuthController {
     this.authService.findUserElseRegister(
       user.kakaoID,
       user.name,
-      user.profile_image,
+      user.profileImage,
     );
     res.redirect('http://localhost:3000'); //이후 변경 필요
   }

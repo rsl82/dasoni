@@ -23,7 +23,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
 
       const user = {
         kakaoID: id.toString(),
-        profile_image,
+        profileImage: profile_image,
         name: nickname,
       };
       return user;
