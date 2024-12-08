@@ -25,9 +25,12 @@ export class AuthController {
   ) {
     const { accessToken, refreshToken } =
       await this.authService.initializeJwtTokens(kakaoUser);
-    console.log(accessToken);
-    console.log(refreshToken);
+    res.setHeader('Authorization', `Bearer ${accessToken}`);
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      maxAge: 3 * 24 * 60 * 60 * 1000,
+    });
 
-    res.redirect('http://localhost:3000'); //이후 변경 필요
+    return res.json({ message: 'Login Success' });
   }
 }
