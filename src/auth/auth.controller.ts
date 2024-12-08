@@ -11,7 +11,7 @@ export class AuthController {
   //카카오 로그인 URL
   @Get('kakao')
   @UseGuards(AuthGuard('kakao'))
-  async kakaoAuth(@Req() req: Request) {
+  kakaoAuth(@Req() req: Request) {
     return;
   }
 
@@ -19,7 +19,7 @@ export class AuthController {
   @Get('kakao/callback')
   @UseGuards(AuthGuard('kakao'))
   async kakaoCallback(@UserInfo() user, @Res() res: Response) {
-    this.authService.findUserElseRegister(
+    await this.authService.findUserElseRegister(
       user.kakaoID,
       user.name,
       user.profileImage,

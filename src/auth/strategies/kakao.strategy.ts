@@ -12,7 +12,7 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     });
   }
 
-  async validate(accessToken: string, refreshToken: string, profile: Profile) {
+  validate(accessToken: string, refreshToken: string, profile: Profile) {
     try {
       const {
         _json: {
