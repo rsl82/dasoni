@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
@@ -13,12 +13,9 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  //토큰 초기화
-  async initializeJwtTokens(kakaoUser: kakaoUserDto) {
-    const kakaoID = await this.findUserElseRegister(kakaoUser);
+  async generateTokens(kakaoID: string) {
     const accessToken = this.generateAccessToken(kakaoID);
     const refreshToken = await this.generateRefreshToken(kakaoID);
-
     return { accessToken, refreshToken };
   }
 
@@ -57,5 +54,28 @@ export class AuthService {
       );
     }
     return user.kakaoID;
+  }
+
+  //RTR 방식으로 accesstoken이 초기화될 때 refreshToken도 같이 초기화 시켜줌
+  async refreshTokens(refreshToken: string) {
+    try {
+      const kakaoID = this.jwtService.verify(refreshToken, {
+        secret: this.configService.get('JWT_REFRESH_SECRET'),
+      }).kakaoID;
+      const user = await this.userService.findKakaoUser(kakaoID);
+
+      const matchingRefreshToken = await argon2.verify(
+        user.refreshToken,
+        refreshToken,
+      );
+
+      if (!matchingRefreshToken) {
+        throw new Error('Not Matching Token');
+      }
+      return await this.generateTokens(kakaoID);
+    } catch (error) {
+      console.debug('Error in refreshTokens logic.');
+      throw new UnauthorizedException('Invalid Token');
+    }
   }
 }

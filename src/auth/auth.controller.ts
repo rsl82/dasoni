@@ -1,4 +1,11 @@
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Req,
+  Res,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from './decorators/user-info.decorator';
@@ -24,8 +31,10 @@ export class AuthController {
     @UserInfo() kakaoUser: kakaoUserDto,
     @Res() res: Response,
   ) {
+    const kakaoID = await this.authService.findUserElseRegister(kakaoUser);
     const { accessToken, refreshToken } =
-      await this.authService.initializeJwtTokens(kakaoUser);
+      await this.authService.generateTokens(kakaoID);
+
     res.setHeader('Authorization', `Bearer ${accessToken}`);
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -33,9 +42,29 @@ export class AuthController {
     });
 
     //console log
-    console.log(accessToken);
+    console.log(`accessToken: ${accessToken}`);
+    console.log(`refreshToken: ${refreshToken}`);
 
     return res.json({ message: 'Login Success' });
+  }
+
+  @Get('/refresh')
+  async refreshToken(@Req() req: Request, @Res() res: Response) {
+    try {
+      const { accessToken, refreshToken } =
+        await this.authService.refreshTokens(req.cookies.refreshToken);
+
+      res.setHeader('Authorization', `Bearer ${accessToken}`);
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        maxAge: 3 * 24 * 60 * 60 * 1000,
+      });
+
+      return res.json({ message: 'Refresh Success' });
+    } catch (error) {
+      //res.clearCookie('refreshToken');
+      throw new UnauthorizedException();
+    }
   }
 
   @Get('/test')
