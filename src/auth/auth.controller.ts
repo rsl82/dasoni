@@ -72,5 +72,6 @@ export class AuthController {
   test(@JwtToKakaoID() kakaoID: string) {
     console.log(kakaoID);
     return 'success';
+
   }
 }
