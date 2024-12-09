@@ -41,9 +41,9 @@ export class AuthController {
       maxAge: 3 * 24 * 60 * 60 * 1000,
     });
 
-    //console log
-    console.log(`accessToken: ${accessToken}`);
-    console.log(`refreshToken: ${refreshToken}`);
+    //console debugging log
+    console.debug(`accessToken: ${accessToken}`);
+    console.debug(`refreshToken: ${refreshToken}`);
 
     return res.json({ message: 'Login Success' });
   }
@@ -70,8 +70,7 @@ export class AuthController {
   @Get('/test')
   @UseGuards(AuthGuard('jwt'))
   test(@JwtToKakaoID() kakaoID: string) {
-    console.log(kakaoID);
+    console.debug(kakaoID);
     return 'success';
-
   }
 }

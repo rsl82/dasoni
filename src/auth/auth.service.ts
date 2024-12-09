@@ -16,7 +16,8 @@ export class AuthService {
 
   async generateTokens(kakaoID: string) {
     const accessToken = this.generateAccessToken(kakaoID);
-    const refreshToken = await this.generateRefreshToken(kakaoID);
+    const refreshToken = this.generateRefreshToken(kakaoID);
+    await this.hashAndSetRefreshToken(kakaoID, refreshToken);
     return { accessToken, refreshToken };
   }
 
@@ -28,19 +29,23 @@ export class AuthService {
 
   //refresh token 생성
   //refresh token db 저장 후 db에서 관리 예정
-  async generateRefreshToken(kakaoID: string) {
+  generateRefreshToken(kakaoID: string): string {
     const payload = { kakaoID };
 
     const refreshToken = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
       expiresIn: this.configService.get<string>('JWT_REFRESH_EXPIRES_IN'),
     });
+    return refreshToken;
+  }
 
+  async hashAndSetRefreshToken(
+    kakaoID: string,
+    refreshToken: string,
+  ): Promise<void> {
     const hashedRefreshToken = await argon2.hash(refreshToken);
 
     await this.userService.setRefreshToken(kakaoID, hashedRefreshToken);
-
-    return refreshToken;
   }
 
   //카카오 ID를 기반으로 유저를 조회하고 없을 시에는 유저 생성 후 리턴
