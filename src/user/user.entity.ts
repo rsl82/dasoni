@@ -10,4 +10,8 @@ export class User extends BaseEntity {
 
   @Column()
   profileImage: string;
+
+  @Column({ nullable: true })
+  refreshToken: string;
+
 }

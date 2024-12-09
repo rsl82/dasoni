@@ -31,4 +31,8 @@ export class UserService {
       where: { kakaoID },
     });
   }
+
+  async setRefreshToken(kakaoID: string, refreshToken: string) {
+    await this.userRepository.update({ kakaoID }, { refreshToken });
+  }
 }
