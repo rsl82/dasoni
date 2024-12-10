@@ -13,7 +13,6 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-
   async generateTokens(kakaoID: string) {
     const accessToken = this.generateAccessToken(kakaoID);
     const refreshToken = this.generateRefreshToken(kakaoID);
@@ -73,7 +72,6 @@ export class AuthService {
       const matchingRefreshToken = await argon2.verify(
         user.refreshToken,
         refreshToken,
-
       );
 
       if (!matchingRefreshToken) {

@@ -35,17 +35,20 @@ export class AuthController {
     const { accessToken, refreshToken } =
       await this.authService.generateTokens(kakaoID);
 
-    res.setHeader('Authorization', `Bearer ${accessToken}`);
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      maxAge: 30 * 60 * 1000,
+    });
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      maxAge: 3 * 24 * 60 * 60 * 1000,
+      maxAge: 5 * 24 * 60 * 60 * 1000,
     });
 
     //console debugging log
     console.debug(`accessToken: ${accessToken}`);
     console.debug(`refreshToken: ${refreshToken}`);
 
-    return res.json({ message: 'Login Success' });
+    return res.status(200).send({ message: 'Login Success' });
   }
 
   @Get('/refresh')
@@ -54,13 +57,16 @@ export class AuthController {
       const { accessToken, refreshToken } =
         await this.authService.refreshTokens(req.cookies.refreshToken);
 
-      res.setHeader('Authorization', `Bearer ${accessToken}`);
+      res.cookie('accessToken', accessToken, {
+        httpOnly: true,
+        maxAge: 30 * 60 * 1000,
+      });
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
         maxAge: 3 * 24 * 60 * 60 * 1000,
       });
 
-      return res.json({ message: 'Refresh Success' });
+      return res.status(200).send({ message: 'Refresh Success' });
     } catch (error) {
       //res.clearCookie('refreshToken');
       throw new UnauthorizedException();
