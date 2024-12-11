@@ -14,7 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   validate(payload) {
     try {
-      return { kakaoID: payload.kakaoID };
+      return { id: payload.id };
     } catch (error) {
       console.debug(error.stack);
       throw new UnauthorizedException();

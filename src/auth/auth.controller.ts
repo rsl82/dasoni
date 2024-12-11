@@ -10,8 +10,8 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from './decorators/user-info.decorator';
 import { Request, Response } from 'express';
-import { kakaoUserDto } from './dto/kakao-user.dto';
-import { JwtToKakaoID } from './decorators/jwt-to-kakao-id.decorator';
+import { socialUserDto } from '../user/dto/social-user.dto';
+import { JwtToID } from './decorators/jwt-to-id.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -28,12 +28,12 @@ export class AuthController {
   @Get('kakao/callback')
   @UseGuards(AuthGuard('kakao'))
   async kakaoCallback(
-    @UserInfo() kakaoUser: kakaoUserDto,
+    @UserInfo() kakaoUser: socialUserDto,
     @Res() res: Response,
   ) {
-    const kakaoID = await this.authService.findUserElseRegister(kakaoUser);
+    const id = await this.authService.findUserElseRegister(kakaoUser);
     const { accessToken, refreshToken } =
-      await this.authService.generateTokens(kakaoID);
+      await this.authService.generateTokens(id);
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
@@ -75,8 +75,8 @@ export class AuthController {
 
   @Get('/test')
   @UseGuards(AuthGuard('jwt'))
-  test(@JwtToKakaoID() kakaoID: string) {
-    console.debug(kakaoID);
+  test(@JwtToID() id: string) {
+    console.debug(id);
     return 'success';
   }
 }

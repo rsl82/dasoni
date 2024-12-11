@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
 import * as argon2 from 'argon2';
-import { kakaoUserDto } from './dto/kakao-user.dto';
+import { socialUserDto } from '../user/dto/social-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -13,23 +13,23 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async generateTokens(kakaoID: string) {
-    const accessToken = this.generateAccessToken(kakaoID);
-    const refreshToken = this.generateRefreshToken(kakaoID);
-    await this.hashAndSetRefreshToken(kakaoID, refreshToken);
+  async generateTokens(id: string) {
+    const accessToken = this.generateAccessToken(id);
+    const refreshToken = this.generateRefreshToken(id);
+    await this.hashAndSetRefreshToken(id, refreshToken);
     return { accessToken, refreshToken };
   }
 
   //access token 생성
-  generateAccessToken(kakaoID: string): string {
-    const payload = { kakaoID };
+  generateAccessToken(id: string): string {
+    const payload = { id };
     return this.jwtService.sign(payload);
   }
 
   //refresh token 생성
   //refresh token db 저장 후 db에서 관리 예정
-  generateRefreshToken(kakaoID: string): string {
-    const payload = { kakaoID };
+  generateRefreshToken(id: string): string {
+    const payload = { id };
 
     const refreshToken = this.jwtService.sign(payload, {
       secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
@@ -39,35 +39,31 @@ export class AuthService {
   }
 
   async hashAndSetRefreshToken(
-    kakaoID: string,
+    id: string,
     refreshToken: string,
   ): Promise<void> {
     const hashedRefreshToken = await argon2.hash(refreshToken);
 
-    await this.userService.setRefreshToken(kakaoID, hashedRefreshToken);
+    await this.userService.setRefreshToken(id, hashedRefreshToken);
   }
 
   //카카오 ID를 기반으로 유저를 조회하고 없을 시에는 유저 생성 후 리턴
-  async findUserElseRegister(kakaoUser: kakaoUserDto): Promise<string> {
+  async findUserElseRegister(kakaoUser: socialUserDto): Promise<string> {
     let user = await this.userService.findKakaoUser(kakaoUser.kakaoID);
 
     if (!user) {
-      user = await this.userService.registerKakaoUser(
-        kakaoUser.kakaoID,
-        kakaoUser.name,
-        kakaoUser.profileImage,
-      );
+      user = await this.userService.registerKakaoUser(kakaoUser);
     }
-    return user.kakaoID;
+    return user.id;
   }
 
   //RTR 방식으로 accesstoken이 초기화될 때 refreshToken도 같이 초기화 시켜줌
   async refreshTokens(refreshToken: string) {
     try {
-      const kakaoID = this.jwtService.verify(refreshToken, {
+      const id = this.jwtService.verify(refreshToken, {
         secret: this.configService.get('JWT_REFRESH_SECRET'),
-      }).kakaoID;
-      const user = await this.userService.findKakaoUser(kakaoID);
+      }).id;
+      const user = await this.userService.findUser(id);
 
       const matchingRefreshToken = await argon2.verify(
         user.refreshToken,
@@ -77,7 +73,7 @@ export class AuthService {
       if (!matchingRefreshToken) {
         throw new Error('Not Matching Token');
       }
-      return await this.generateTokens(kakaoID);
+      return await this.generateTokens(id);
     } catch (error) {
       console.debug('Error in refreshTokens logic.');
       throw new UnauthorizedException('Invalid Token');
