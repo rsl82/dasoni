@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Patch,
   Post,
@@ -27,19 +28,36 @@ export class UserController {
     @Body(new ValidationPipe()) nameUpdateDto: NameDto,
     @Res() res: Response,
   ) {
-    const response = await this.userService.updateName(id, nameUpdateDto);
+    const code = await this.userService.updateName(id, nameUpdateDto);
+
+    let response: SuccessResponseDto;
+    if (code === 200) {
+      response = new SuccessResponseDto(true, 'Update Success', 200);
+    } else if (code === 409) {
+      response = new SuccessResponseDto(false, 'Name is already taken', 409);
+    } else {
+      response = new SuccessResponseDto(false, 'Internal Server Error', 500);
+    }
+
     return res.status(response.statusCode).json(response);
   }
 
   @Get('/search')
-  async findUser(@Query(new ValidationPipe()) nameSearchDto: NameDto) {
+  async findUser(
+    @Query(new ValidationPipe()) nameSearchDto: NameDto,
+    @Res() res: Response,
+  ) {
     const result = await this.userService.findUserByName(nameSearchDto.name);
+    let response: SuccessResponseDto;
     if (!result) {
-      return new SuccessResponseDto(false, 'User Not Found', 404);
+      response = new SuccessResponseDto(false, 'User Not Found', 404);
+    } else {
+      response = new SuccessResponseDto(true, 'Found User', 200, {
+        id: result,
+      });
     }
-    return new SuccessResponseDto(true, 'Found User', 200, {
-      id: result,
-    });
+
+    return res.status(response.statusCode).json(response);
   }
 
   @Patch('/logout')
@@ -47,5 +65,12 @@ export class UserController {
     res.clearCookie('refreshToken');
     res.clearCookie('accessToken');
     await this.userService.deleteRefreshToken(id);
+
+    const response = new SuccessResponseDto(true, 'Logout Success', 200);
+
+    return res.status(response.statusCode).json(response);
   }
+
+  @Delete()
+  async deleteAccount(@JwtToID() id: string, @Res() res: Response) {}
 }

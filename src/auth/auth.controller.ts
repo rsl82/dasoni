@@ -74,7 +74,8 @@ export class AuthController {
       return res.status(response.statusCode).json(response);
     } catch (error) {
       //res.clearCookie('refreshToken');
-      throw new UnauthorizedException();
+      const response = new SuccessResponseDto(false, 'Unauthorized', 401);
+      return res.status(response.statusCode).json(response);
     }
   }
 

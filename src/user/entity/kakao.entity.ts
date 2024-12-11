@@ -12,7 +12,7 @@ export class KakaoUser extends BaseEntity {
   @PrimaryColumn()
   kakaoID: string;
 
-  @OneToOne(() => User, (user) => user.kakaoUser)
+  @OneToOne(() => User, (user) => user.kakaoUser, { onDelete: 'CASCADE' })
   @JoinColumn()
   user: User;
 }

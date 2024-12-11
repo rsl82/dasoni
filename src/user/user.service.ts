@@ -72,12 +72,12 @@ export class UserService {
   async updateName(id: string, nameUpdateDto: NameDto) {
     try {
       await this.userRepository.update({ id }, { name: nameUpdateDto.name });
-      return new SuccessResponseDto(true, 'Update Success', 200);
+      return 200;
     } catch (error) {
       if (error instanceof QueryFailedError) {
-        return new SuccessResponseDto(false, 'Name is already taken', 409);
+        return 409;
       }
-      return new SuccessResponseDto(false, 'Internal Server Error', 500);
+      return 500;
     }
   }
 }
