@@ -4,12 +4,12 @@ import { UserService } from './user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
 import { KakaoUser } from './entity/kakao.entity';
-import { socialUserDto } from './dto/social-user.dto';
+import { UtilModule } from 'src/util/util.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([User, KakaoUser])],
+  imports: [UtilModule, TypeOrmModule.forFeature([User, KakaoUser])],
   controllers: [UserController],
-  providers: [UserService, socialUserDto],
-  exports: [UserService, socialUserDto],
+  providers: [UserService],
+  exports: [UserService],
 })
 export class UserModule {}

@@ -7,6 +7,7 @@ import { TypeOrmConfigService } from './configs/db.config';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { MediaModule } from './media/media.module';
+import { UtilModule } from './util/util.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { MediaModule } from './media/media.module';
     UserModule,
     AuthModule,
     MediaModule,
+    UtilModule,
   ],
   controllers: [AppController],
   providers: [AppService],

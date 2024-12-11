@@ -8,10 +8,10 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
-import { UserInfo } from './decorators/user-info.decorator';
+import { UserInfo } from '../util/decorators/user-info.decorator';
 import { Request, Response } from 'express';
-import { socialUserDto } from '../user/dto/social-user.dto';
-import { JwtToID } from './decorators/jwt-to-id.decorator';
+import { socialUserDto } from '../util/dto/social-user.dto';
+import { JwtToID } from '../util/decorators/jwt-to-id.decorator';
 
 @Controller('auth')
 export class AuthController {
