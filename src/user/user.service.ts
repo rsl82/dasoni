@@ -4,7 +4,7 @@ import { User } from './entity/user.entity';
 import { QueryFailedError, Repository } from 'typeorm';
 import { KakaoUser } from './entity/kakao.entity';
 import { socialUserDto } from '../util/dto/social-user.dto';
-import { NameUpdateDto } from './dto/name-update.dto';
+import { NameDto } from './dto/name-update.dto';
 import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
 
 @Injectable()
@@ -52,11 +52,24 @@ export class UserService {
     await this.userRepository.update({ id }, { refreshToken });
   }
 
+  async deleteRefreshToken(id: string) {
+    await this.userRepository.update({ id }, { refreshToken: null });
+  }
+
   async findUser(id: string): Promise<User> {
     return await this.userRepository.findOne({ where: { id } });
   }
 
-  async updateName(id: string, nameUpdateDto: NameUpdateDto) {
+  async findUserByName(name: string) {
+    const user = await this.userRepository.findOne({ where: { name } });
+    if (!user) {
+      return null;
+    }
+
+    return user.id;
+  }
+
+  async updateName(id: string, nameUpdateDto: NameDto) {
     try {
       await this.userRepository.update({ id }, { name: nameUpdateDto.name });
       return new SuccessResponseDto(true, 'Update Success', 200);
