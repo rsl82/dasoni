@@ -6,9 +6,14 @@ import { Diary } from './diary.entity';
 import { User } from 'src/user/entity/user.entity';
 import { UtilModule } from 'src/util/util.module';
 import { UserModule } from 'src/user/user.module';
+import { Media } from 'src/media/media.entity';
 
 @Module({
-  imports: [UtilModule, UserModule, TypeOrmModule.forFeature([Diary, User])],
+  imports: [
+    UtilModule,
+    UserModule,
+    TypeOrmModule.forFeature([Diary, User, Media]),
+  ],
   controllers: [DiaryController],
   providers: [DiaryService],
 })

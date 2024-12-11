@@ -4,7 +4,6 @@ import { DiaryDto } from './diary.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Diary } from './diary.entity';
 import { Repository } from 'typeorm';
-import { title } from 'process';
 
 @Injectable()
 export class DiaryService {

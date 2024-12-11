@@ -1,3 +1,4 @@
+import { Media } from 'src/media/media.entity';
 import { User } from 'src/user/entity/user.entity';
 import {
   BaseEntity,
@@ -6,6 +7,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -33,6 +35,12 @@ export class Diary extends BaseEntity {
   @ManyToOne(() => User, (user) => user.sentDiary)
   @JoinColumn({ name: 'senderID' })
   sender: User;
+
+  @OneToMany(() => Media, (media) => media.diary, {
+    nullable: true,
+    lazy: true,
+  })
+  photos: Promise<Media[]>;
 
   @Column({ default: false })
   isDeleted: boolean;
