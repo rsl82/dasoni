@@ -3,7 +3,7 @@ import { UserService } from 'src/user/user.service';
 import { DiaryDto } from './diary.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Diary } from './diary.entity';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { StatusCodes } from 'http-status-codes';
 
 @Injectable()
@@ -52,5 +52,16 @@ export class DiaryService {
     await this.diaryRepository.save(diary);
 
     return StatusCodes.OK;
+  }
+
+  async searchDiary(id: string, search: string) {
+    return await this.diaryRepository
+      .createQueryBuilder('diary')
+      .where('(diary.sender.id = :id OR diary.receiver.id = :id)', { id })
+      .andWhere('(diary.title LIKE :search OR diary.message LIKE :search)', {
+        search: `%${search}%`,
+      })
+      .andWhere('(diary.isDeleted = :isDeleted)', { isDeleted: false })
+      .getMany();
   }
 }

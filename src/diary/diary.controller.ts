@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { DiaryService } from './diary.service';
 import { JwtToID } from 'src/util/decorators/jwt-to-id.decorator';
 import { UserService } from 'src/user/user.service';
@@ -55,5 +63,21 @@ export class DiaryController {
 
     const response = new SuccessResponseDto(false, 'Error in posting diary');
     return res.status(result).json(response);
+  }
+
+  @Get('/search')
+  async searchDiary(
+    @JwtToID() id: string,
+    @Query() query,
+    @Res() res: Response,
+  ) {
+    try {
+      const result = await this.diaryService.searchDiary(id, query.search);
+      const response = new SuccessResponseDto(true, 'search result', {
+        diary: result,
+      });
+      console.debug(response);
+      return res.status(StatusCodes.OK).json(response);
+    } catch (error) {}
   }
 }
