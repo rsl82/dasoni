@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { KakaoUser } from './entity/kakao.entity';
 import { socialUserDto } from '../util/dto/social-user.dto';
+import { NameUpdateDto } from './dto/name-update.dto';
+import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
 
 @Injectable()
 export class UserService {
@@ -52,5 +54,17 @@ export class UserService {
 
   async findUser(id: string): Promise<User> {
     return await this.userRepository.findOne({ where: { id } });
+  }
+
+  async updateName(id: string, nameUpdateDto: NameUpdateDto) {
+    try {
+      await this.userRepository.update({ id }, { name: nameUpdateDto.name });
+      return new SuccessResponseDto(true, 'Update Success', 200);
+    } catch (error) {
+      if (error instanceof QueryFailedError) {
+        return new SuccessResponseDto(false, 'Name is already taken', 409);
+      }
+      return new SuccessResponseDto(false, 'Internal Server Error', 500);
+    }
   }
 }

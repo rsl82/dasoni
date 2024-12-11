@@ -12,6 +12,7 @@ import { UserInfo } from '../util/decorators/user-info.decorator';
 import { Request, Response } from 'express';
 import { socialUserDto } from '../util/dto/social-user.dto';
 import { JwtToID } from '../util/decorators/jwt-to-id.decorator';
+import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -48,7 +49,9 @@ export class AuthController {
     console.debug(`accessToken: ${accessToken}`);
     console.debug(`refreshToken: ${refreshToken}`);
 
-    return res.status(200).send({ message: 'Login Success' });
+    const response = new SuccessResponseDto(true, 'Login Success', 200);
+
+    return res.status(response.statusCode).json(response);
   }
 
   @Get('/refresh')
@@ -66,7 +69,9 @@ export class AuthController {
         maxAge: 3 * 24 * 60 * 60 * 1000,
       });
 
-      return res.status(200).send({ message: 'Refresh Success' });
+      const response = new SuccessResponseDto(true, 'Refresh Success', 200);
+
+      return res.status(response.statusCode).json(response);
     } catch (error) {
       //res.clearCookie('refreshToken');
       throw new UnauthorizedException();
