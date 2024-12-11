@@ -4,11 +4,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { KakaoUser } from './kakao.entity';
+import { Diary } from 'src/diary/diary.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -32,4 +34,10 @@ export class User extends BaseEntity {
 
   @OneToOne(() => KakaoUser, (kakaoUser) => kakaoUser.user, { nullable: true })
   kakaoUser: KakaoUser;
+
+  @OneToMany(() => Diary, (diary) => diary.receiver, { nullable: true })
+  receivedDiary: Diary[];
+
+  @OneToMany(() => Diary, (diary) => diary.sender, { nullable: true })
+  sentDiary: Diary[];
 }
