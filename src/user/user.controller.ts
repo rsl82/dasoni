@@ -32,14 +32,14 @@ export class UserController {
 
     let response: SuccessResponseDto;
     if (code === 200) {
-      response = new SuccessResponseDto(true, 'Update Success', 200);
+      response = new SuccessResponseDto(true, 'Update Success');
     } else if (code === 409) {
-      response = new SuccessResponseDto(false, 'Name is already taken', 409);
+      response = new SuccessResponseDto(false, 'Name is already taken');
     } else {
-      response = new SuccessResponseDto(false, 'Internal Server Error', 500);
+      response = new SuccessResponseDto(false, 'Internal Server Error');
     }
 
-    return res.status(response.statusCode).json(response);
+    return res.status(code).json(response);
   }
 
   @Get('/search')
@@ -49,15 +49,18 @@ export class UserController {
   ) {
     const result = await this.userService.findUserByName(nameSearchDto.name);
     let response: SuccessResponseDto;
+    let code: number;
     if (!result) {
-      response = new SuccessResponseDto(false, 'User Not Found', 404);
+      response = new SuccessResponseDto(false, 'User Not Found');
+      code = 404;
     } else {
-      response = new SuccessResponseDto(true, 'Found User', 200, {
+      code = 200;
+      response = new SuccessResponseDto(true, 'Found User', {
         id: result,
       });
     }
 
-    return res.status(response.statusCode).json(response);
+    return res.status(code).json(response);
   }
 
   @Patch('/logout')
@@ -66,9 +69,9 @@ export class UserController {
     res.clearCookie('accessToken');
     await this.userService.deleteRefreshToken(id);
 
-    const response = new SuccessResponseDto(true, 'Logout Success', 200);
+    const response = new SuccessResponseDto(true, 'Logout Success');
 
-    return res.status(response.statusCode).json(response);
+    return res.status(200).json(response);
   }
 
   @Delete()

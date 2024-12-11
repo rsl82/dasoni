@@ -49,9 +49,9 @@ export class AuthController {
     console.debug(`accessToken: ${accessToken}`);
     console.debug(`refreshToken: ${refreshToken}`);
 
-    const response = new SuccessResponseDto(true, 'Login Success', 200);
+    const response = new SuccessResponseDto(true, 'Login Success');
 
-    return res.status(response.statusCode).json(response);
+    return res.status(200).json(response);
   }
 
   @Get('/refresh')
@@ -69,13 +69,13 @@ export class AuthController {
         maxAge: 3 * 24 * 60 * 60 * 1000,
       });
 
-      const response = new SuccessResponseDto(true, 'Refresh Success', 200);
+      const response = new SuccessResponseDto(true, 'Refresh Success');
 
-      return res.status(response.statusCode).json(response);
+      return res.status(200).json(response);
     } catch (error) {
       //res.clearCookie('refreshToken');
-      const response = new SuccessResponseDto(false, 'Unauthorized', 401);
-      return res.status(response.statusCode).json(response);
+      const response = new SuccessResponseDto(false, 'Unauthorized');
+      return res.status(401).json(response);
     }
   }
 
