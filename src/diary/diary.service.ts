@@ -22,6 +22,14 @@ export class DiaryService {
     return await user.sentDiary;
   }
 
+  async receivedDiary(id: string) {
+    const user = await this.userService.findUser(id);
+    if (!user) {
+      return null;
+    }
+    return await user.receivedDiary;
+  }
+
   async postDiary(id: string, diaryDto: DiaryDto) {
     const sender = await this.userService.findUser(id);
     const receiver = await this.userService.findUser(diaryDto.receiverID);

@@ -27,6 +27,20 @@ export class DiaryController {
     return res.status(StatusCodes.OK).json(response);
   }
 
+  @Get('/received')
+  async receivedDiary(@JwtToID() id: string, @Res() res: Response) {
+    const content = await this.diaryService.receivedDiary(id);
+    if (content === null) {
+      const response = new SuccessResponseDto(false, 'User Not Found');
+      return res.status(StatusCodes.NOT_FOUND).json(response);
+    }
+
+    const response = new SuccessResponseDto(true, 'Received Diary', {
+      diary: content,
+    });
+    return res.status(StatusCodes.OK).json(response);
+  }
+
   @Post()
   async postDiary(
     @JwtToID() id: string,
