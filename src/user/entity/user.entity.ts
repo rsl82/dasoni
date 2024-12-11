@@ -35,9 +35,15 @@ export class User extends BaseEntity {
   @OneToOne(() => KakaoUser, (kakaoUser) => kakaoUser.user, { nullable: true })
   kakaoUser: KakaoUser;
 
-  @OneToMany(() => Diary, (diary) => diary.receiver, { nullable: true })
-  receivedDiary: Diary[];
+  @OneToMany(() => Diary, (diary) => diary.receiver, {
+    nullable: true,
+    lazy: true,
+  })
+  receivedDiary: Promise<Diary[]>;
 
-  @OneToMany(() => Diary, (diary) => diary.sender, { nullable: true })
-  sentDiary: Diary[];
+  @OneToMany(() => Diary, (diary) => diary.sender, {
+    nullable: true,
+    lazy: true,
+  })
+  sentDiary: Promise<Diary[]>;
 }
