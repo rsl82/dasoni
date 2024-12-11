@@ -14,6 +14,7 @@ import { Response } from 'express';
 import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
 import { MediaDto } from './media.dto';
 import { JwtToID } from 'src/util/decorators/jwt-to-id.decorator';
+import { StatusCodes } from 'http-status-codes';
 
 @Controller('media')
 @UseGuards(AuthGuard('jwt'))
@@ -33,7 +34,7 @@ export class MediaController {
         false,
         'Only JPEG and PNG files are allowed',
       );
-      return res.status(400).json(response);
+      return res.status(StatusCodes.BAD_REQUEST).json(response);
     }
 
     const result = await this.mediaService.uploadImage(file, id, mediaDto);

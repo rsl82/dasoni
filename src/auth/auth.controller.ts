@@ -13,6 +13,7 @@ import { Request, Response } from 'express';
 import { socialUserDto } from '../util/dto/social-user.dto';
 import { JwtToID } from '../util/decorators/jwt-to-id.decorator';
 import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
+import { StatusCodes } from 'http-status-codes';
 
 @Controller('auth')
 export class AuthController {
@@ -51,7 +52,7 @@ export class AuthController {
 
     const response = new SuccessResponseDto(true, 'Login Success');
 
-    return res.status(200).json(response);
+    return res.status(StatusCodes.OK).json(response);
   }
 
   @Get('/refresh')
@@ -71,11 +72,11 @@ export class AuthController {
 
       const response = new SuccessResponseDto(true, 'Refresh Success');
 
-      return res.status(200).json(response);
+      return res.status(StatusCodes.OK).json(response);
     } catch (error) {
       //res.clearCookie('refreshToken');
       const response = new SuccessResponseDto(false, 'Unauthorized');
-      return res.status(401).json(response);
+      return res.status(StatusCodes.UNAUTHORIZED).json(response);
     }
   }
 

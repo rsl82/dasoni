@@ -6,6 +6,7 @@ import { Response } from 'express';
 import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
 import { DiaryDto } from './diary.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { StatusCodes } from 'http-status-codes';
 
 @Controller('diary')
 @UseGuards(AuthGuard('jwt'))
@@ -17,13 +18,13 @@ export class DiaryController {
     const content = await this.diaryService.sentDiary(id);
     if (content === null) {
       const response = new SuccessResponseDto(false, 'User Not Found');
-      return res.status(404).json(response);
+      return res.status(StatusCodes.NOT_FOUND).json(response);
     }
 
     const response = new SuccessResponseDto(true, 'Sent Diary', {
       diary: content,
     });
-    return res.status(200).json(response);
+    return res.status(StatusCodes.OK).json(response);
   }
 
   @Post()
@@ -33,9 +34,9 @@ export class DiaryController {
     @Res() res: Response,
   ) {
     const result = await this.diaryService.postDiary(id, diaryDto);
-    if (result === 200) {
+    if (result === StatusCodes.OK) {
       const response = new SuccessResponseDto(true, 'Post Diary');
-      return res.status(200).json(response);
+      return res.status(StatusCodes.OK).json(response);
     }
 
     const response = new SuccessResponseDto(false, 'Error in posting diary');

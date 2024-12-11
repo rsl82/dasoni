@@ -6,6 +6,7 @@ import { KakaoUser } from './entity/kakao.entity';
 import { socialUserDto } from '../util/dto/social-user.dto';
 import { NameDto } from './dto/name-update.dto';
 import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
+import { StatusCodes } from 'http-status-codes';
 
 @Injectable()
 export class UserService {
@@ -72,12 +73,12 @@ export class UserService {
   async updateName(id: string, nameUpdateDto: NameDto) {
     try {
       await this.userRepository.update({ id }, { name: nameUpdateDto.name });
-      return 200;
+      return StatusCodes.OK;
     } catch (error) {
       if (error instanceof QueryFailedError) {
-        return 409;
+        return StatusCodes.CONFLICT;
       }
-      return 500;
+      return StatusCodes.INTERNAL_SERVER_ERROR;
     }
   }
 }

@@ -4,6 +4,7 @@ import { DiaryDto } from './diary.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Diary } from './diary.entity';
 import { Repository } from 'typeorm';
+import { StatusCodes } from 'http-status-codes';
 
 @Injectable()
 export class DiaryService {
@@ -26,7 +27,7 @@ export class DiaryService {
     const receiver = await this.userService.findUser(diaryDto.receiverID);
 
     if (!sender || !receiver) {
-      return 404;
+      return StatusCodes.NOT_FOUND;
     }
 
     const diary = this.diaryRepository.create({
@@ -42,6 +43,6 @@ export class DiaryService {
 
     await this.diaryRepository.save(diary);
 
-    return 200;
+    return StatusCodes.OK;
   }
 }

@@ -16,6 +16,7 @@ import { JwtToID } from 'src/util/decorators/jwt-to-id.decorator';
 import { NameDto } from './dto/name-update.dto';
 import { Response } from 'express';
 import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
+import { StatusCodes } from 'http-status-codes';
 
 @Controller('user')
 @UseGuards(AuthGuard('jwt'))
@@ -31,9 +32,9 @@ export class UserController {
     const code = await this.userService.updateName(id, nameUpdateDto);
 
     let response: SuccessResponseDto;
-    if (code === 200) {
+    if (code === StatusCodes.OK) {
       response = new SuccessResponseDto(true, 'Update Success');
-    } else if (code === 409) {
+    } else if (code === StatusCodes.CONFLICT) {
       response = new SuccessResponseDto(false, 'Name is already taken');
     } else {
       response = new SuccessResponseDto(false, 'Internal Server Error');
@@ -52,9 +53,9 @@ export class UserController {
     let code: number;
     if (!result) {
       response = new SuccessResponseDto(false, 'User Not Found');
-      code = 404;
+      code = StatusCodes.NOT_FOUND;
     } else {
-      code = 200;
+      code = StatusCodes.OK;
       response = new SuccessResponseDto(true, 'Found User', {
         id: result,
       });
@@ -71,7 +72,7 @@ export class UserController {
 
     const response = new SuccessResponseDto(true, 'Logout Success');
 
-    return res.status(200).json(response);
+    return res.status(StatusCodes.OK).json(response);
   }
 
   @Delete()
