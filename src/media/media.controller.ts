@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Post,
   UploadedFile,
@@ -16,7 +17,7 @@ export class MediaController {
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
-  async uploadImage(@UploadedFile() file: Express.Multer.File) {
-    return this.mediaService.uploadImage('x', file, 'png');
+  async uploadImage(@UploadedFile() file: Express.Multer.File, @Body() body) {
+    return this.mediaService.uploadImage(file.filename, file, file.mimetype);
   }
 }

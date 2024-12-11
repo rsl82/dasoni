@@ -22,7 +22,7 @@ export class MediaService {
       Key: fileName,
       Body: file.buffer,
       ACL: 'public-read',
-      ContentType: `image/${ext}`,
+      ContentType: ext,
     });
 
     await this.s3.send(uploader);

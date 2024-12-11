@@ -8,9 +8,11 @@ import { UserModule } from 'src/user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtConfigService } from 'src/configs/jwt.config';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { UtilModule } from 'src/util/util.module';
 
 @Module({
   imports: [
+    UtilModule,
     UserModule,
     ConfigModule,
     PassportModule,

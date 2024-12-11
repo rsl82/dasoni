@@ -1,6 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
-export const JwtToKakaoID = createParamDecorator((_, ctx: ExecutionContext) => {
+export const JwtToID = createParamDecorator((_, ctx: ExecutionContext) => {
   const req = ctx.switchToHttp().getRequest();
-  return req.user.kakaoID;
+  return req.user.id;
 });

@@ -8,10 +8,11 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
-import { UserInfo } from './decorators/user-info.decorator';
+import { UserInfo } from '../util/decorators/user-info.decorator';
 import { Request, Response } from 'express';
-import { kakaoUserDto } from './dto/kakao-user.dto';
-import { JwtToKakaoID } from './decorators/jwt-to-kakao-id.decorator';
+import { socialUserDto } from '../util/dto/social-user.dto';
+import { JwtToID } from '../util/decorators/jwt-to-id.decorator';
+import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -28,12 +29,12 @@ export class AuthController {
   @Get('kakao/callback')
   @UseGuards(AuthGuard('kakao'))
   async kakaoCallback(
-    @UserInfo() kakaoUser: kakaoUserDto,
+    @UserInfo() kakaoUser: socialUserDto,
     @Res() res: Response,
   ) {
-    const kakaoID = await this.authService.findUserElseRegister(kakaoUser);
+    const id = await this.authService.findUserElseRegister(kakaoUser);
     const { accessToken, refreshToken } =
-      await this.authService.generateTokens(kakaoID);
+      await this.authService.generateTokens(id);
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
@@ -48,7 +49,9 @@ export class AuthController {
     console.debug(`accessToken: ${accessToken}`);
     console.debug(`refreshToken: ${refreshToken}`);
 
-    return res.status(200).send({ message: 'Login Success' });
+    const response = new SuccessResponseDto(true, 'Login Success');
+
+    return res.status(200).json(response);
   }
 
   @Get('/refresh')
@@ -66,17 +69,20 @@ export class AuthController {
         maxAge: 3 * 24 * 60 * 60 * 1000,
       });
 
-      return res.status(200).send({ message: 'Refresh Success' });
+      const response = new SuccessResponseDto(true, 'Refresh Success');
+
+      return res.status(200).json(response);
     } catch (error) {
       //res.clearCookie('refreshToken');
-      throw new UnauthorizedException();
+      const response = new SuccessResponseDto(false, 'Unauthorized');
+      return res.status(401).json(response);
     }
   }
 
   @Get('/test')
   @UseGuards(AuthGuard('jwt'))
-  test(@JwtToKakaoID() kakaoID: string) {
-    console.debug(kakaoID);
+  test(@JwtToID() id: string) {
+    console.debug(id);
     return 'success';
   }
 }
