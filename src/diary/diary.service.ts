@@ -14,6 +14,7 @@ export class DiaryService {
     private readonly diaryRepository: Repository<Diary>,
   ) {}
 
+  /*
   async sentDiary(id: string) {
     const user = await this.userService.findUser(id);
     if (!user) {
@@ -28,6 +29,28 @@ export class DiaryService {
       return null;
     }
     return await user.receivedDiary;
+  }
+  */
+
+  async listDiary(id: string) {
+    return await this.diaryRepository
+      .createQueryBuilder('diary')
+      .innerJoin('diary.sender', 'sender')
+      .innerJoin('diary.receiver', 'receiver')
+      .select([
+        'diary.id',
+        'diary.title',
+        'diary.message',
+        'diary.createdAt',
+        'diary.location',
+        'sender.id',
+        'sender.name',
+        'receiver.id',
+        'receiver.name',
+      ])
+      .where('(diary.sender.id = :id OR diary.receiver.id = :id)', { id })
+      .andWhere('(diary.isDeleted = :isDeleted)', { isDeleted: false })
+      .getMany();
   }
 
   async postDiary(id: string, diaryDto: DiaryDto) {
@@ -57,6 +80,19 @@ export class DiaryService {
   async searchDiary(id: string, search: string) {
     return await this.diaryRepository
       .createQueryBuilder('diary')
+      .innerJoin('diary.sender', 'sender')
+      .innerJoin('diary.receiver', 'receiver')
+      .select([
+        'diary.id',
+        'diary.title',
+        'diary.message',
+        'diary.createdAt',
+        'diary.location',
+        'sender.id',
+        'sender.name',
+        'receiver.id',
+        'receiver.name',
+      ])
       .where('(diary.sender.id = :id OR diary.receiver.id = :id)', { id })
       .andWhere('(diary.title LIKE :search OR diary.message LIKE :search)', {
         search: `%${search}%`,

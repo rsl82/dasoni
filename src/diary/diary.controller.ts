@@ -21,6 +21,7 @@ import { StatusCodes } from 'http-status-codes';
 export class DiaryController {
   constructor(private readonly diaryService: DiaryService) {}
 
+  /*
   @Get('/sent')
   async sentDiary(@JwtToID() id: string, @Res() res: Response) {
     const content = await this.diaryService.sentDiary(id);
@@ -47,6 +48,19 @@ export class DiaryController {
       diary: content,
     });
     return res.status(StatusCodes.OK).json(response);
+  }
+  */
+
+  @Get()
+  async listDiary(@JwtToID() id: string, @Res() res: Response) {
+    try {
+      const result = await this.diaryService.listDiary(id);
+      const response = new SuccessResponseDto(true, 'Load Success', {
+        diary: result,
+      });
+      console.debug(response);
+      return res.status(StatusCodes.OK).json(response);
+    } catch (error) {}
   }
 
   @Post()
