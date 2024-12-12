@@ -5,9 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
 import { KakaoUser } from './entity/kakao.entity';
 import { UtilModule } from 'src/util/util.module';
+import { Diary } from 'src/diary/diary.entity';
 
 @Module({
-  imports: [UtilModule, TypeOrmModule.forFeature([User, KakaoUser])],
+  imports: [UtilModule, TypeOrmModule.forFeature([User, KakaoUser, Diary])],
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService],

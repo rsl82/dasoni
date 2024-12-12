@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import { MediaDto } from './media.dto';
 
 @Injectable()
 export class MediaService {
@@ -16,15 +17,17 @@ export class MediaService {
     });
   }
 
-  async uploadImage(fileName: string, file: Express.Multer.File, ext: string) {
+  async uploadImage(file: Express.Multer.File, id: string, mediaDto: MediaDto) {
+    const fileName = 'x';
+
     const uploader = new PutObjectCommand({
       Bucket: this.configService.get<string>('S3_BUCKET_NAME'),
       Key: fileName,
       Body: file.buffer,
       ACL: 'public-read',
-      ContentType: ext,
+      ContentType: file.mimetype,
     });
 
-    await this.s3.send(uploader);
+    return await this.s3.send(uploader);
   }
 }

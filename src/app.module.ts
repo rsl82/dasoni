@@ -8,6 +8,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { MediaModule } from './media/media.module';
 import { UtilModule } from './util/util.module';
+import { DiaryModule } from './diary/diary.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { UtilModule } from './util/util.module';
     AuthModule,
     MediaModule,
     UtilModule,
+    DiaryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
