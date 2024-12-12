@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
   Query,
   Res,
@@ -93,5 +95,33 @@ export class DiaryController {
       console.debug(response);
       return res.status(StatusCodes.OK).json(response);
     } catch (error) {}
+  }
+
+  @Delete(':id')
+  async deleteDiary(@Param('id') id: string, @Res() res: Response) {
+    const result = await this.diaryService.deleteDiary(id);
+    console.debug(result);
+    if (result.affected === 0) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json(new SuccessResponseDto(false, 'No Diary with this ID'));
+    }
+
+    return res
+      .status(StatusCodes.NO_CONTENT)
+      .json(new SuccessResponseDto(true, 'Deletion Success'));
+  }
+
+  @Delete()
+  async deleteAllDiary(@JwtToID() id: string, @Res() res: Response) {
+    const result = await this.diaryService.deleteAllDiary(id);
+    if (!result) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json(new SuccessResponseDto(false, 'Not Found'));
+    }
+    return res
+      .status(StatusCodes.NO_CONTENT)
+      .json(new SuccessResponseDto(true, 'Deletion Success'));
   }
 }
