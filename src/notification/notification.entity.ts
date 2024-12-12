@@ -1,9 +1,11 @@
+import { User } from 'src/user/entity/user.entity';
 import { NotiType } from 'src/util/enum/type.enum';
 import {
   BaseEntity,
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -11,9 +13,6 @@ import {
 export class Notification extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @Column('uuid')
-  receiverID: string;
 
   @Column()
   title: string;
@@ -32,4 +31,7 @@ export class Notification extends BaseEntity {
 
   @Column({ type: 'timestamptz', nullable: true })
   readAt: Date | null;
+
+  @ManyToOne(() => User, (user) => user.notifications, { onDelete: 'CASCADE' })
+  receiver: User;
 }

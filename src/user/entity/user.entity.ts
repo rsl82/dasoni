@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { KakaoUser } from './kakao.entity';
 import { Diary } from 'src/diary/diary.entity';
+import { Notification } from 'src/notification/notification.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -46,4 +47,15 @@ export class User extends BaseEntity {
     lazy: true,
   })
   sentDiary: Promise<Diary[]>;
+
+  @OneToMany(() => Notification, (notification) => notification.receiver, {
+    nullable: true,
+    lazy: true,
+  })
+  notifications: Promise<Notification[]>;
+
+  async getNotifications(): Promise<Notification[]> {
+    const noti = await this.notifications;
+    return noti.filter((noti) => noti.readAt !== null);
+  }
 }
