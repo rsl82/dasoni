@@ -1,7 +1,7 @@
-import { MediaType } from './media-type.enum';
+import { NotiType } from '../util/enum/type.enum';
 
 export class MediaDto {
-  type: MediaType;
+  type: NotiType;
 
   diaryID?: string;
 }
