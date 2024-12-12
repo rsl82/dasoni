@@ -19,4 +19,12 @@ export class NotificationService {
     }
     return await user.getNotifications();
   }
+
+  async findNotification(id: string): Promise<Notification> {
+    return await this.notiRepository.findOne({ where: { id } });
+  }
+
+  async readNotification(id: string) {
+    return await this.notiRepository.update({ id }, { readAt: new Date() });
+  }
 }

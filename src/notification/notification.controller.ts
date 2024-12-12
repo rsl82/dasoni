@@ -25,5 +25,16 @@ export class NotificationController {
   }
 
   @Patch(':id')
-  readNotification(@Param('id') id: string, @Res() res: Response) {}
+  async readNotification(@Param('id') id: string, @Res() res: Response) {
+    const result = await this.notiSerivce.readNotification(id);
+    if (result.affected === 0) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json(new SuccessResponseDto(false, 'Notification Not Found'));
+    }
+
+    return res
+      .status(StatusCodes.OK)
+      .json(new SuccessResponseDto(true, 'Success Update'));
+  }
 }
