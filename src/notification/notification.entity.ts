@@ -15,12 +15,6 @@ export class Notification extends BaseEntity {
   @Column('uuid')
   receiverID: string;
 
-  @CreateDateColumn({ type: 'timestamptz' })
-  createdAt: Date;
-
-  @Column({ type: 'timestamptz', nullable: true })
-  readAt: Date | null;
-
   @Column()
   title: string;
 
@@ -32,4 +26,10 @@ export class Notification extends BaseEntity {
 
   @Column('uuid')
   relatedID: string;
+
+  @CreateDateColumn({ type: 'timestamptz' })
+  createdAt: Date;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  readAt: Date | null;
 }
