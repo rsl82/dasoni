@@ -1,10 +1,10 @@
 import {
   Body,
+  ConflictException,
   Controller,
   Delete,
   Get,
   Patch,
-  Post,
   Query,
   Res,
   UploadedFile,
@@ -17,9 +17,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwtToID } from 'src/util/decorators/jwt-to-id.decorator';
 import { NameDto } from './dto/name-update.dto';
 import { Response } from 'express';
-import { SuccessResponseDto } from 'src/util/dto/response.dto';
+import { ResponseDto } from 'src/util/dto/response.dto';
 import { StatusCodes } from 'http-status-codes';
-import { MediaDto } from 'src/util/dto/media.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('user')
@@ -33,18 +32,20 @@ export class UserController {
     @Body(new ValidationPipe()) nameUpdateDto: NameDto,
     @Res() res: Response,
   ) {
-    const code = await this.userService.updateName(id, nameUpdateDto);
+    try {
+      await this.userService.updateName(id, nameUpdateDto);
+      const response = new ResponseDto('Update Success');
 
-    let response: SuccessResponseDto;
-    if (code === StatusCodes.OK) {
-      response = new SuccessResponseDto(true, 'Update Success');
-    } else if (code === StatusCodes.CONFLICT) {
-      response = new SuccessResponseDto(false, 'Name is already taken');
-    } else {
-      response = new SuccessResponseDto(false, 'Internal Server Error');
+      return res.status(StatusCodes.OK).json(response);
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        const response = new ResponseDto('Name is already taken');
+        return res.status(StatusCodes.CONFLICT).json(response);
+      } else {
+        const response = new ResponseDto('Internal Server Error');
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(response);
+      }
     }
-
-    return res.status(code).json(response);
   }
 
   @Get('/search')
@@ -52,31 +53,27 @@ export class UserController {
     @Query(new ValidationPipe()) nameSearchDto: NameDto,
     @Res() res: Response,
   ) {
-    const result = await this.userService.findUserByName(nameSearchDto.name);
-    let response: SuccessResponseDto;
-    let code: number;
-    if (!result) {
-      response = new SuccessResponseDto(false, 'User Not Found');
-      code = StatusCodes.NOT_FOUND;
-    } else {
-      code = StatusCodes.OK;
-      response = new SuccessResponseDto(true, 'Found User', {
-        id: result,
-      });
-    }
+    try {
+      const result = await this.userService.findUserByName(nameSearchDto.name);
 
-    return res.status(code).json(response);
+      const response = new ResponseDto('Found User', { id: result });
+      return res.status(StatusCodes.OK).json(response);
+    } catch (error) {
+      const response = new ResponseDto('User Not Found');
+      return res.status(StatusCodes.NOT_FOUND).json(response);
+    }
   }
 
   @Patch('/logout')
   async logout(@JwtToID() id: string, @Res() res: Response) {
-    res.clearCookie('refreshToken');
-    res.clearCookie('accessToken');
-    await this.userService.deleteRefreshToken(id);
+    try {
+      await this.userService.deleteRefreshToken(id);
+      res.clearCookie('refreshToken');
+      res.clearCookie('accessToken');
+      const response = new ResponseDto('Logout Success');
 
-    const response = new SuccessResponseDto(true, 'Logout Success');
-
-    return res.status(StatusCodes.OK).json(response);
+      return res.status(StatusCodes.OK).json(response);
+    } catch (error) {}
   }
 
   @Delete()
@@ -86,15 +83,13 @@ export class UserController {
   @UseInterceptors(FileInterceptor('file'))
   async updateProfileImage(
     @JwtToID() id: string,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile('photo') photo: Express.Multer.File,
     @Res() res: Response,
   ) {
-    const result = await this.userService.updateProfileImage(file, id);
-
-    console.debug(result);
-
-    return res
-      .status(StatusCodes.OK)
-      .json(new SuccessResponseDto(true, 'Update Success'));
+    try {
+      await this.userService.updateProfileImage(photo, id);
+      const response = new ResponseDto('Update Success');
+      return res.status(StatusCodes.OK).json(response);
+    } catch (error) {}
   }
 }
