@@ -7,7 +7,10 @@ import {
   Post,
   Query,
   Res,
+  UploadedFile,
+  UploadedFiles,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { DiaryService } from './diary.service';
 import { JwtToID } from 'src/util/decorators/jwt-to-id.decorator';
@@ -17,6 +20,7 @@ import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
 import { DiaryDto } from './diary.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { StatusCodes } from 'http-status-codes';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
 @Controller('diary')
 @UseGuards(AuthGuard('jwt'))
@@ -66,12 +70,14 @@ export class DiaryController {
   }
 
   @Post()
+  @UseInterceptors(FileFieldsInterceptor([{ name: 'photos', maxCount: 4 }]))
   async postDiary(
     @JwtToID() id: string,
     @Body() diaryDto: DiaryDto,
+    @UploadedFiles() files: { photos?: Express.Multer.File[] },
     @Res() res: Response,
   ) {
-    const result = await this.diaryService.postDiary(id, diaryDto);
+    const result = await this.diaryService.postDiary(id, diaryDto, files);
     if (result === StatusCodes.OK) {
       const response = new SuccessResponseDto(true, 'Post Diary');
       return res.status(StatusCodes.OK).json(response);
@@ -124,4 +130,19 @@ export class DiaryController {
       .status(StatusCodes.NO_CONTENT)
       .json(new SuccessResponseDto(true, 'Deletion Success'));
   }
+
+  @Get('/photos')
+  async getDiaryPhotos(@Body('id') id: string, @Res() res: Response) {
+    console.debug(id);
+    const result = await this.diaryService.getDiaryPhotos(id);
+    if (!result) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json(new SuccessResponseDto(false, 'Not Found'));
+    }
+    return res
+      .status(StatusCodes.OK)
+      .json(new SuccessResponseDto(true, 'Success', { photos: result }));
+  }
+
 }

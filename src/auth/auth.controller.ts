@@ -47,12 +47,15 @@ export class AuthController {
     });
 
     //console debugging log
+
     console.debug(`accessToken: ${accessToken}`);
     console.debug(`refreshToken: ${refreshToken}`);
 
     const response = new SuccessResponseDto(true, 'Login Success');
 
-    return res.status(StatusCodes.OK).json(response);
+    return res.redirect(
+      `http://localhost:3000/login/success?token=${accessToken}`,
+    );
   }
 
   @Get('/refresh')

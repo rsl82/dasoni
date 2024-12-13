@@ -12,7 +12,8 @@ import {
 
 @Entity()
 export class Media extends BaseEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('uuid')
+
   id: string;
 
   @Column({ nullable: true })
