@@ -7,13 +7,11 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryColumn,
-  PrimaryGeneratedColumn,
 } from 'typeorm';
 
 @Entity()
 export class Media extends BaseEntity {
   @PrimaryColumn('uuid')
-
   id: string;
 
   @Column({ nullable: true })
