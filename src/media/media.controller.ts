@@ -12,7 +12,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
-import { MediaDto } from './media.dto';
+import { MediaDto } from '../util/dto/media.dto';
 import { JwtToID } from 'src/util/decorators/jwt-to-id.decorator';
 import { StatusCodes } from 'http-status-codes';
 
@@ -21,6 +21,7 @@ import { StatusCodes } from 'http-status-codes';
 export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
 
+  /*
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(
@@ -42,4 +43,5 @@ export class MediaController {
 
     res.status(result.$metadata.httpStatusCode).json(response);
   }
+    */
 }

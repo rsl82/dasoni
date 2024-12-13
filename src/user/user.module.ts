@@ -8,10 +8,12 @@ import { UtilModule } from 'src/util/util.module';
 import { Diary } from 'src/diary/diary.entity';
 import { FriendRequest } from 'src/friend/entity/friend-request.entity';
 import { Friend } from 'src/friend/entity/friend.entity';
+import { MediaModule } from 'src/media/media.module';
 
 @Module({
   imports: [
     UtilModule,
+    MediaModule,
     TypeOrmModule.forFeature([User, KakaoUser, Diary, FriendRequest, Friend]),
   ],
   controllers: [UserController],

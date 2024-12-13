@@ -7,6 +7,11 @@ import { socialUserDto } from '../util/dto/social-user.dto';
 import { NameDto } from './dto/name-update.dto';
 import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
 import { StatusCodes } from 'http-status-codes';
+import { MediaDto } from 'src/util/dto/media.dto';
+import { NotiType } from 'src/util/enum/type.enum';
+import { v4 as uuidv4 } from 'uuid';
+import { MediaService } from 'src/media/media.service';
+import * as mime from 'mime-types';
 
 @Injectable()
 export class UserService {
@@ -15,6 +20,7 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(KakaoUser)
     private readonly kakaoRepository: Repository<KakaoUser>,
+    private readonly mediaService: MediaService,
   ) {}
 
   //다른 소셜 로그인이 생기면 일반 레지스터와 소셜 레지스터를 나눠서 관리할 예정
@@ -80,5 +86,20 @@ export class UserService {
       }
       return StatusCodes.INTERNAL_SERVER_ERROR;
     }
+  }
+
+  async updateProfileImage(
+    file: Express.Multer.File,
+    id: string,
+    mediaDto: MediaDto,
+  ) {
+    const mediaID = uuidv4();
+    const ext = mime.extension(file.mimetype);
+    const fileName = `${mediaID}.${ext}`;
+
+    mediaDto.fileName = fileName;
+    const url = await this.mediaService.uploadImage(file, mediaID, mediaDto);
+
+    return await this.userRepository.update({ id }, { profileImage: url });
   }
 }

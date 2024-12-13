@@ -7,7 +7,9 @@ import {
   Post,
   Query,
   Res,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
   ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -17,6 +19,8 @@ import { NameDto } from './dto/name-update.dto';
 import { Response } from 'express';
 import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
 import { StatusCodes } from 'http-status-codes';
+import { MediaDto } from 'src/util/dto/media.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('user')
 @UseGuards(AuthGuard('jwt'))
@@ -77,4 +81,21 @@ export class UserController {
 
   @Delete()
   async deleteAccount(@JwtToID() id: string, @Res() res: Response) {}
+
+  @Patch('profile-image')
+  @UseInterceptors(FileInterceptor('file'))
+  async updateProfileImage(
+    @JwtToID() id: string,
+    @UploadedFile() file: Express.Multer.File,
+    @Body() mediaDto: MediaDto,
+    @Res() res: Response,
+  ) {
+    const result = await this.userService.updateProfileImage(
+      file,
+      id,
+      mediaDto,
+    );
+
+    console.debug(result);
+  }
 }
