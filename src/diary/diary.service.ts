@@ -3,7 +3,7 @@ import { UserService } from 'src/user/user.service';
 import { DiaryDto } from './diary.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Diary } from './diary.entity';
-import { Brackets, EntityManager, Repository, Transaction } from 'typeorm';
+import { Repository } from 'typeorm';
 import { StatusCodes } from 'http-status-codes';
 import { MediaService } from 'src/media/media.service';
 import { NotificationService } from 'src/notification/notification.service';
