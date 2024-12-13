@@ -22,6 +22,7 @@ import { StatusCodes } from 'http-status-codes';
 import { MediaDto } from 'src/util/dto/media.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
+
 @Controller('user')
 @UseGuards(AuthGuard('jwt'))
 export class UserController {

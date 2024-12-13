@@ -16,6 +16,7 @@ export class DiaryService {
     private readonly diaryRepository: Repository<Diary>,
     private readonly mediaService: MediaService,
     private readonly notiService: NotificationService,
+
   ) {}
 
   /*
@@ -57,11 +58,13 @@ export class DiaryService {
       .getMany();
   }
 
+
   async postDiary(
     id: string,
     diaryDto: DiaryDto,
     files: { photos?: Express.Multer.File[] },
   ) {
+
     const sender = await this.userService.findUser(id);
     const receiver = await this.userService.findUser(diaryDto.receiverID);
 
@@ -114,6 +117,7 @@ export class DiaryService {
     } finally {
       await queryRunner.release();
     }
+
   }
 
   async searchDiary(id: string, search: string) {
@@ -169,4 +173,5 @@ export class DiaryService {
     }
     return diary.photos;
   }
+
 }

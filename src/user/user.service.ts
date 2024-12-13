@@ -14,6 +14,7 @@ import { MediaService } from 'src/media/media.service';
 import * as mime from 'mime-types';
 import { query } from 'express';
 
+
 @Injectable()
 export class UserService {
   constructor(
@@ -102,6 +103,7 @@ export class UserService {
       throw error;
     } finally {
       await queryRunner.release();
+
     }
   }
 }

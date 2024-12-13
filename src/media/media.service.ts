@@ -11,6 +11,7 @@ import { Diary } from 'src/diary/diary.entity';
 import { Query } from 'typeorm/driver/Query';
 import { query } from 'express';
 
+
 @Injectable()
 export class MediaService {
   private s3: S3Client;
@@ -37,6 +38,7 @@ export class MediaService {
     const mediaID = uuidv4();
     const ext = mime.extension(file.mimetype);
     const fileName = `${mediaID}.${ext}`;
+
 
     const uploader = new PutObjectCommand({
       Bucket: this.configService.get<string>('S3_BUCKET_NAME'),
@@ -78,5 +80,6 @@ export class MediaService {
     );
 
     return photos;
+
   }
 }

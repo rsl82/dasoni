@@ -16,6 +16,7 @@ import { MediaModule } from 'src/media/media.module';
     MediaModule,
     TypeOrmModule.forFeature([User, KakaoUser, Diary, FriendRequest, Friend]),
   ],
+
   controllers: [UserController],
   providers: [UserService],
   exports: [UserService],

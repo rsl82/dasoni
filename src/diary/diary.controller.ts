@@ -144,4 +144,5 @@ export class DiaryController {
       .status(StatusCodes.OK)
       .json(new SuccessResponseDto(true, 'Success', { photos: result }));
   }
+
 }

@@ -15,6 +15,7 @@ import { Notification } from 'src/notification/notification.entity';
 import { FriendRequest } from 'src/friend/entity/friend-request.entity';
 import { Friend } from 'src/friend/entity/friend.entity';
 
+
 @Entity()
 export class User extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
@@ -73,4 +74,5 @@ export class User extends BaseEntity {
     lazy: true,
   })
   friends: Promise<Friend[]>;
+
 }
