@@ -6,6 +6,7 @@ import { Diary } from './diary.entity';
 import { Brackets, EntityManager, Repository, Transaction } from 'typeorm';
 import { StatusCodes } from 'http-status-codes';
 import { MediaService } from 'src/media/media.service';
+import { NotificationService } from 'src/notification/notification.service';
 
 @Injectable()
 export class DiaryService {
@@ -14,6 +15,7 @@ export class DiaryService {
     @InjectRepository(Diary)
     private readonly diaryRepository: Repository<Diary>,
     private readonly mediaService: MediaService,
+    private readonly notiService: NotificationService,
   ) {}
 
   /*
@@ -86,12 +88,23 @@ export class DiaryService {
       await queryRunner.manager.save(Diary, diary);
 
       //사진 추가하는 메서드 작성 후 추가 예정
-      const photos = await this.mediaService.uploadDiaryPhotos(
-        files.photos,
-        diary,
+      if (files.photos) {
+        const photos = await this.mediaService.uploadDiaryPhotos(
+          files.photos,
+          diary,
+          queryRunner,
+        );
+        console.debug(photos);
+      }
+
+      await this.notiService.createNotification(
+        'NEW DIARY',
+        '',
+        receiver.id,
+        diary.id,
         queryRunner,
       );
-      console.debug(photos);
+
       await queryRunner.commitTransaction();
 
       return StatusCodes.OK;
