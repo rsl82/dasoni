@@ -3,20 +3,20 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Post,
   Query,
   Res,
-  UploadedFile,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
+  ValidationPipe,
 } from '@nestjs/common';
 import { DiaryService } from './diary.service';
 import { JwtToID } from 'src/util/decorators/jwt-to-id.decorator';
-import { UserService } from 'src/user/user.service';
 import { Response } from 'express';
-import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
+import { ResponseDto } from 'src/util/dto/response.dto';
 import { DiaryDto } from './diary.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { StatusCodes } from 'http-status-codes';
@@ -61,7 +61,7 @@ export class DiaryController {
   async listDiary(@JwtToID() id: string, @Res() res: Response) {
     try {
       const result = await this.diaryService.listDiary(id);
-      const response = new SuccessResponseDto(true, 'Load Success', {
+      const response = new ResponseDto('Load Success', {
         diary: result,
       });
       console.debug(response);
@@ -73,76 +73,79 @@ export class DiaryController {
   @UseInterceptors(FileFieldsInterceptor([{ name: 'photos', maxCount: 4 }]))
   async postDiary(
     @JwtToID() id: string,
-    @Body() diaryDto: DiaryDto,
+    @Body(new ValidationPipe()) diaryDto: DiaryDto,
     @UploadedFiles() files: { photos?: Express.Multer.File[] },
     @Res() res: Response,
   ) {
-    const result = await this.diaryService.postDiary(id, diaryDto, files);
-    if (result === StatusCodes.OK) {
-      const response = new SuccessResponseDto(true, 'Post Diary');
-      return res.status(StatusCodes.OK).json(response);
-    }
+    try {
+      await this.diaryService.postDiary(id, diaryDto, files);
 
-    const response = new SuccessResponseDto(false, 'Error in posting diary');
-    return res.status(result).json(response);
+      const response = new ResponseDto('Post Diary');
+      return res.status(StatusCodes.OK).json(response);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        const response = new ResponseDto('Not Found');
+        return res.status(StatusCodes.NOT_FOUND).json(response);
+      } else {
+        const response = new ResponseDto('Error while posting diary');
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(response);
+      }
+    }
   }
 
   @Get('/search')
   async searchDiary(
     @JwtToID() id: string,
-    @Query() query,
+    @Query('search') search: string,
     @Res() res: Response,
   ) {
     try {
-      const result = await this.diaryService.searchDiary(id, query.search);
-      const response = new SuccessResponseDto(true, 'search result', {
+      const result = await this.diaryService.searchDiary(id, search);
+      const response = new ResponseDto('Search Result', {
         diary: result,
       });
-      console.debug(response);
       return res.status(StatusCodes.OK).json(response);
-    } catch (error) {}
+    } catch (error) {
+      console.debug(error);
+      const response = new ResponseDto('Error while searching diary');
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(response);
+    }
   }
 
   @Delete(':id')
   async deleteDiary(@Param('id') id: string, @Res() res: Response) {
-    const result = await this.diaryService.deleteDiary(id);
-    console.debug(result);
-    if (result.affected === 0) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json(new SuccessResponseDto(false, 'No Diary with this ID'));
-    }
+    try {
+      await this.diaryService.deleteDiary(id);
 
-    return res
-      .status(StatusCodes.NO_CONTENT)
-      .json(new SuccessResponseDto(true, 'Deletion Success'));
+      const response = new ResponseDto('Deletion Success');
+      return res.status(StatusCodes.OK).json(response);
+    } catch (error) {
+      const response = new ResponseDto('No Diary with this ID');
+      return res.status(StatusCodes.NOT_FOUND).json(response);
+    }
   }
 
   @Delete()
   async deleteAllDiary(@JwtToID() id: string, @Res() res: Response) {
-    const result = await this.diaryService.deleteAllDiary(id);
-    if (!result) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json(new SuccessResponseDto(false, 'Not Found'));
+    try {
+      await this.diaryService.deleteAllDiary(id);
+      const response = new ResponseDto('Deletion Success');
+      return res.status(StatusCodes.OK).json(response);
+    } catch (error) {
+      const response = new ResponseDto('Not Found');
+      return res.status(StatusCodes.NOT_FOUND).json(response);
     }
-    return res
-      .status(StatusCodes.NO_CONTENT)
-      .json(new SuccessResponseDto(true, 'Deletion Success'));
   }
 
   @Get('/photos')
   async getDiaryPhotos(@Body('id') id: string, @Res() res: Response) {
-    console.debug(id);
-    const result = await this.diaryService.getDiaryPhotos(id);
-    if (!result) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json(new SuccessResponseDto(false, 'Not Found'));
+    try {
+      const result = await this.diaryService.getDiaryPhotos(id);
+      const response = new ResponseDto('Success', { photos: result });
+      return res.status(StatusCodes.OK).json(response);
+    } catch (error) {
+      const response = new ResponseDto('Diary Not Found');
+      return res.status(StatusCodes.NOT_FOUND).json(response);
     }
-    return res
-      .status(StatusCodes.OK)
-      .json(new SuccessResponseDto(true, 'Success', { photos: result }));
   }
-
 }

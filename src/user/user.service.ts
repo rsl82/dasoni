@@ -5,7 +5,7 @@ import { QueryFailedError, Repository } from 'typeorm';
 import { KakaoUser } from './entity/kakao.entity';
 import { socialUserDto } from '../util/dto/social-user.dto';
 import { NameDto } from './dto/name-update.dto';
-import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
+import { SuccessResponseDto } from 'src/util/dto/response.dto';
 import { StatusCodes } from 'http-status-codes';
 import { MediaDto } from 'src/util/dto/media.dto';
 import { NotiType } from 'src/util/enum/type.enum';
@@ -13,7 +13,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { MediaService } from 'src/media/media.service';
 import * as mime from 'mime-types';
 import { query } from 'express';
-
 
 @Injectable()
 export class UserService {
@@ -103,7 +102,6 @@ export class UserService {
       throw error;
     } finally {
       await queryRunner.release();
-
     }
   }
 }

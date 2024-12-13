@@ -12,7 +12,7 @@ import { JwtToID } from 'src/util/decorators/jwt-to-id.decorator';
 import { FriendService } from './friend.service';
 import { Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
+import { SuccessResponseDto } from 'src/util/dto/response.dto';
 
 @Controller('friend')
 @UseGuards(AuthGuard('jwt'))

@@ -1,3 +1,5 @@
+import { IsOptional } from 'class-validator';
+
 export class DiaryDto {
   title: string;
 
@@ -5,5 +7,6 @@ export class DiaryDto {
 
   receiverID: string;
 
+  @IsOptional()
   location?: string;
 }

@@ -4,7 +4,7 @@ import { Response } from 'express';
 import { JwtToID } from 'src/util/decorators/jwt-to-id.decorator';
 import { NotificationService } from './notification.service';
 import { StatusCodes } from 'http-status-codes';
-import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
+import { SuccessResponseDto } from 'src/util/dto/response.dto';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('notification')

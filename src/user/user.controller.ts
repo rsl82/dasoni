@@ -17,11 +17,10 @@ import { AuthGuard } from '@nestjs/passport';
 import { JwtToID } from 'src/util/decorators/jwt-to-id.decorator';
 import { NameDto } from './dto/name-update.dto';
 import { Response } from 'express';
-import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
+import { SuccessResponseDto } from 'src/util/dto/response.dto';
 import { StatusCodes } from 'http-status-codes';
 import { MediaDto } from 'src/util/dto/media.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-
 
 @Controller('user')
 @UseGuards(AuthGuard('jwt'))

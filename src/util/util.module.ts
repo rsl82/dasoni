@@ -1,10 +1,10 @@
 import { Module } from '@nestjs/common';
 import { socialUserDto } from './dto/social-user.dto';
-import { SuccessResponseDto } from './dto/success-response.dto';
+import { ResponseDto } from './dto/response.dto';
 import { MediaDto } from './dto/media.dto';
 
 @Module({
-  providers: [socialUserDto, SuccessResponseDto, MediaDto],
-  exports: [socialUserDto, SuccessResponseDto, MediaDto],
+  providers: [socialUserDto, ResponseDto, MediaDto],
+  exports: [socialUserDto, ResponseDto, MediaDto],
 })
 export class UtilModule {}
