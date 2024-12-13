@@ -38,9 +38,7 @@ export class AuthController {
       await this.authService.generateTokens(id);
 
     res.cookie('accessToken', accessToken, {
-      domain: 'localhost',
-      sameSite: 'none',
-      httpOnly: false,
+      httpOnly: true,
       maxAge: 30 * 60 * 1000,
     });
     res.cookie('refreshToken', refreshToken, {
@@ -55,7 +53,9 @@ export class AuthController {
 
     const response = new SuccessResponseDto(true, 'Login Success');
 
-    return res.redirect('http://localhost:3000/login/success');
+    return res.redirect(
+      `http://localhost:3000/login/success?token=${accessToken}`,
+    );
   }
 
   @Get('/refresh')
@@ -65,9 +65,7 @@ export class AuthController {
         await this.authService.refreshTokens(req.cookies.refreshToken);
 
       res.cookie('accessToken', accessToken, {
-        domain: 'localhost',
-        sameSite: 'none',
-        httpOnly: false,
+        httpOnly: true,
         maxAge: 30 * 60 * 1000,
       });
       res.cookie('refreshToken', refreshToken, {
