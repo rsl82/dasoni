@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { Notification } from './notification.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserService } from 'src/user/user.service';
+import { NotiType } from 'src/util/enum/type.enum';
 
 @Injectable()
 export class NotificationService {
@@ -13,11 +14,11 @@ export class NotificationService {
   ) {}
 
   async getNotifications(id: string) {
-    const user = await this.userService.findUser(id);
-    if (!user) {
-      return null;
-    }
-    return await user.getNotifications();
+    const result = await this.notiRepository.find({
+      where: { receiver: { id }, readAt: null },
+    });
+    console.debug(result);
+    return result;
   }
 
   async findNotification(id: string): Promise<Notification> {
@@ -26,5 +27,22 @@ export class NotificationService {
 
   async readNotification(id: string) {
     return await this.notiRepository.update({ id }, { readAt: new Date() });
+  }
+
+  async createFriendNotification(
+    title: string,
+    description: string,
+    receiverID: string,
+    friendRequestID: string,
+  ) {
+    const noti = this.notiRepository.create({
+      title,
+      description,
+      receiver: { id: receiverID },
+      type: NotiType.PROFILE,
+      relatedID: friendRequestID,
+    });
+
+    await this.notiRepository.save(noti);
   }
 }
