@@ -13,6 +13,7 @@ import { KakaoUser } from './kakao.entity';
 import { Diary } from 'src/diary/diary.entity';
 import { Notification } from 'src/notification/notification.entity';
 import { FriendRequest } from 'src/friend/entity/friend-request.entity';
+import { Friend } from 'src/friend/entity/friend.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -66,4 +67,10 @@ export class User extends BaseEntity {
     lazy: true,
   })
   receivedRequests: Promise<FriendRequest[]>;
+
+  @OneToMany(() => Friend, (friend) => friend.user, {
+    nullable: true,
+    lazy: true,
+  })
+  friends: Promise<Friend[]>;
 }

@@ -7,11 +7,12 @@ import { KakaoUser } from './entity/kakao.entity';
 import { UtilModule } from 'src/util/util.module';
 import { Diary } from 'src/diary/diary.entity';
 import { FriendRequest } from 'src/friend/entity/friend-request.entity';
+import { Friend } from 'src/friend/entity/friend.entity';
 
 @Module({
   imports: [
     UtilModule,
-    TypeOrmModule.forFeature([User, KakaoUser, Diary, FriendRequest]),
+    TypeOrmModule.forFeature([User, KakaoUser, Diary, FriendRequest, Friend]),
   ],
   controllers: [UserController],
   providers: [UserService],

@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Patch,
+  Post,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtToID } from 'src/util/decorators/jwt-to-id.decorator';
 import { FriendService } from './friend.service';
@@ -22,5 +30,37 @@ export class FriendController {
         .status(StatusCodes.OK)
         .json(new SuccessResponseDto(true, 'Request Sent'));
     } catch (error) {}
+  }
+
+  @Patch()
+  async responseFriendRequest(
+    @Body('requestID') requestID: string,
+    @Body('decision') decision: boolean,
+    @Res() res: Response,
+  ) {
+    try {
+      await this.friendService.responseFriendRequest(requestID, decision);
+      return res
+        .status(StatusCodes.OK)
+        .json(new SuccessResponseDto(true, 'Update Success'));
+    } catch {}
+  }
+
+  @Delete()
+  async deleteFriend(
+    @JwtToID() userID: string,
+    @Body('friendID') friendID: string,
+    @Res() res: Response,
+  ) {
+    const result = await this.friendService.deleteFriend(userID, friendID);
+    if (!result) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json(new SuccessResponseDto(false, 'No Friend Matched'));
+    }
+
+    return res
+      .status(StatusCodes.OK)
+      .json(new SuccessResponseDto(true, 'Success Deletion'));
   }
 }
