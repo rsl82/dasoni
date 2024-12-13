@@ -38,7 +38,9 @@ export class AuthController {
       await this.authService.generateTokens(id);
 
     res.cookie('accessToken', accessToken, {
-      httpOnly: true,
+      domain: 'localhost',
+      sameSite: 'none',
+      httpOnly: false,
       maxAge: 30 * 60 * 1000,
     });
     res.cookie('refreshToken', refreshToken, {
@@ -47,6 +49,7 @@ export class AuthController {
     });
 
     //console debugging log
+
     console.debug(`accessToken: ${accessToken}`);
     console.debug(`refreshToken: ${refreshToken}`);
 
@@ -62,7 +65,9 @@ export class AuthController {
         await this.authService.refreshTokens(req.cookies.refreshToken);
 
       res.cookie('accessToken', accessToken, {
-        httpOnly: true,
+        domain: 'localhost',
+        sameSite: 'none',
+        httpOnly: false,
         maxAge: 30 * 60 * 1000,
       });
       res.cookie('refreshToken', refreshToken, {
