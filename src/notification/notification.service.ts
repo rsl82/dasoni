@@ -30,7 +30,7 @@ export class NotificationService {
 
   async readNotification(id: string) {
     const result = await this.notiRepository.update(
-      { id },
+      { id, readAt: null },
       { readAt: new Date() },
     );
     if (result.affected === 0) {

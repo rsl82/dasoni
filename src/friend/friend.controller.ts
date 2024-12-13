@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -18,6 +19,7 @@ import { ResponseDto } from 'src/util/dto/response.dto';
 @UseGuards(AuthGuard('jwt'))
 export class FriendController {
   constructor(private readonly friendService: FriendService) {}
+
   @Post()
   async sendFriendRequest(
     @JwtToID() senderID: string,
@@ -41,7 +43,14 @@ export class FriendController {
       await this.friendService.responseFriendRequest(requestID, decision);
       const response = new ResponseDto('Update Success');
       return res.status(StatusCodes.OK).json(response);
-    } catch {}
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        const response = new ResponseDto('Bad Request');
+        return res.status(StatusCodes.BAD_REQUEST).json(response);
+      }
+      const response = new ResponseDto('Server Error');
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(response);
+    }
   }
 
   @Delete()

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { FriendRequest } from './entity/friend-request.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -35,15 +39,17 @@ export class FriendService {
 
   async responseFriendRequest(requestID: string, decision: boolean) {
     if (decision) {
-      await this.requestRepository.update(
-        { id: requestID },
-        { status: 'accepted' },
-      );
-
       const result = await this.requestRepository.findOne({
         where: { id: requestID },
         relations: ['receiver', 'sender'],
       });
+      if (result.status !== 'pending') {
+        throw new BadRequestException();
+      }
+      await this.requestRepository.update(
+        { id: requestID },
+        { status: 'accepted' },
+      );
 
       const newFriend = this.friendRepository.create({
         user:

@@ -83,11 +83,11 @@ export class UserController {
   @UseInterceptors(FileInterceptor('file'))
   async updateProfileImage(
     @JwtToID() id: string,
-    @UploadedFile('photo') photo: Express.Multer.File,
+    @UploadedFile() file: Express.Multer.File,
     @Res() res: Response,
   ) {
     try {
-      await this.userService.updateProfileImage(photo, id);
+      await this.userService.updateProfileImage(file, id);
       const response = new ResponseDto('Update Success');
       return res.status(StatusCodes.OK).json(response);
     } catch (error) {}

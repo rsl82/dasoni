@@ -142,7 +142,10 @@ export class DiaryService {
   }
 
   async deleteDiary(id: string) {
-    if (!this.diaryRepository.findOne({ where: { id, isDeleted: false } })) {
+    const finder = await this.diaryRepository.findOne({
+      where: { id, isDeleted: false },
+    });
+    if (!finder) {
       throw new NotFoundException();
     }
     const result = await this.diaryRepository.update(id, { isDeleted: true });
@@ -167,7 +170,7 @@ export class DiaryService {
 
   async getDiaryPhotos(id: string) {
     const diary = await this.diaryRepository.findOne({
-      where: { id },
+      where: { id, isDeleted: false },
       relations: ['photos'],
     });
     if (!diary) {
