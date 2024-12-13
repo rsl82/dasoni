@@ -12,6 +12,7 @@ import {
 import { KakaoUser } from './kakao.entity';
 import { Diary } from 'src/diary/diary.entity';
 import { Notification } from 'src/notification/notification.entity';
+import { FriendRequest } from 'src/friend/entity/friend-request.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -54,8 +55,15 @@ export class User extends BaseEntity {
   })
   notifications: Promise<Notification[]>;
 
-  async getNotifications(): Promise<Notification[]> {
-    const noti = await this.notifications;
-    return noti.filter((noti) => noti.readAt !== null);
-  }
+  @OneToMany(() => FriendRequest, (friendRequest) => friendRequest.sender, {
+    nullable: true,
+    lazy: true,
+  })
+  sentRequests: Promise<FriendRequest[]>;
+
+  @OneToMany(() => FriendRequest, (friendRequest) => friendRequest.receiver, {
+    nullable: true,
+    lazy: true,
+  })
+  receivedRequests: Promise<FriendRequest[]>;
 }
