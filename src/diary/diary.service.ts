@@ -155,4 +155,18 @@ export class DiaryService {
         .execute();
     }
   }
+
+  async getDiaryPhotos(id: string) {
+    console.debug(id);
+    const diary = await this.diaryRepository.findOne({
+      where: { id },
+      relations: ['photos'],
+    });
+
+    console.debug(diary);
+    if (!diary) {
+      throw new Error('Diary Not Found');
+    }
+    return diary.photos;
+  }
 }

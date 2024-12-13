@@ -130,4 +130,18 @@ export class DiaryController {
       .status(StatusCodes.NO_CONTENT)
       .json(new SuccessResponseDto(true, 'Deletion Success'));
   }
+
+  @Get('/photos')
+  async getDiaryPhotos(@Body('id') id: string, @Res() res: Response) {
+    console.debug(id);
+    const result = await this.diaryService.getDiaryPhotos(id);
+    if (!result) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json(new SuccessResponseDto(false, 'Not Found'));
+    }
+    return res
+      .status(StatusCodes.OK)
+      .json(new SuccessResponseDto(true, 'Success', { photos: result }));
+  }
 }
