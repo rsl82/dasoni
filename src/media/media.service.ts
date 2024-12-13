@@ -4,7 +4,12 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { MediaDto } from '../util/dto/media.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Media } from './media.entity';
-import { Repository } from 'typeorm';
+import { QueryRunner, Repository } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
+import * as mime from 'mime-types';
+import { Diary } from 'src/diary/diary.entity';
+import { Query } from 'typeorm/driver/Query';
+import { query } from 'express';
 
 @Injectable()
 export class MediaService {
@@ -24,10 +29,18 @@ export class MediaService {
     });
   }
 
-  async uploadImage(file: Express.Multer.File, id: string, mediaDto: MediaDto) {
+  async uploadImage(
+    file: Express.Multer.File,
+    queryRunner: QueryRunner,
+    diary?: Diary,
+  ) {
+    const mediaID = uuidv4();
+    const ext = mime.extension(file.mimetype);
+    const fileName = `${mediaID}.${ext}`;
+
     const uploader = new PutObjectCommand({
       Bucket: this.configService.get<string>('S3_BUCKET_NAME'),
-      Key: mediaDto.fileName,
+      Key: fileName,
       Body: file.buffer,
       ACL: 'public-read',
       ContentType: file.mimetype,
@@ -38,15 +51,32 @@ export class MediaService {
       '/' +
       this.configService.get<string>('S3_BUCKET_NAME') +
       '/' +
-      mediaDto.fileName;
+      fileName;
 
     const media = this.mediaRepository.create({
-      id,
+      id: mediaID,
       url,
     });
 
-    await this.mediaRepository.save(media);
+    if (diary) {
+      media.diary = diary;
+    }
+    await queryRunner.manager.save(media);
     await this.s3.send(uploader);
     return url;
+  }
+
+  async uploadDiaryPhotos(
+    files: Express.Multer.File[],
+    diary: Diary,
+    queryRunner: QueryRunner,
+  ) {
+    const photos = await Promise.all(
+      files.map(async (file) => {
+        return await this.uploadImage(file, queryRunner, diary);
+      }),
+    );
+
+    return photos;
   }
 }

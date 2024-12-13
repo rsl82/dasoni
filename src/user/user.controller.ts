@@ -87,15 +87,14 @@ export class UserController {
   async updateProfileImage(
     @JwtToID() id: string,
     @UploadedFile() file: Express.Multer.File,
-    @Body() mediaDto: MediaDto,
     @Res() res: Response,
   ) {
-    const result = await this.userService.updateProfileImage(
-      file,
-      id,
-      mediaDto,
-    );
+    const result = await this.userService.updateProfileImage(file, id);
 
     console.debug(result);
+
+    return res
+      .status(StatusCodes.OK)
+      .json(new SuccessResponseDto(true, 'Update Success'));
   }
 }

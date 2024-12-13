@@ -12,6 +12,7 @@ import { NotiType } from 'src/util/enum/type.enum';
 import { v4 as uuidv4 } from 'uuid';
 import { MediaService } from 'src/media/media.service';
 import * as mime from 'mime-types';
+import { query } from 'express';
 
 @Injectable()
 export class UserService {
@@ -88,18 +89,19 @@ export class UserService {
     }
   }
 
-  async updateProfileImage(
-    file: Express.Multer.File,
-    id: string,
-    mediaDto: MediaDto,
-  ) {
-    const mediaID = uuidv4();
-    const ext = mime.extension(file.mimetype);
-    const fileName = `${mediaID}.${ext}`;
+  async updateProfileImage(file: Express.Multer.File, id: string) {
+    const queryRunner =
+      this.userRepository.manager.connection.createQueryRunner();
+    await queryRunner.startTransaction();
+    try {
+      const url = await this.mediaService.uploadImage(file, queryRunner);
 
-    mediaDto.fileName = fileName;
-    const url = await this.mediaService.uploadImage(file, mediaID, mediaDto);
-
-    return await this.userRepository.update({ id }, { profileImage: url });
+      return await this.userRepository.update({ id }, { profileImage: url });
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 }

@@ -3,8 +3,9 @@ import { UserService } from 'src/user/user.service';
 import { DiaryDto } from './diary.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Diary } from './diary.entity';
-import { Brackets, EntityManager, Repository } from 'typeorm';
+import { Brackets, EntityManager, Repository, Transaction } from 'typeorm';
 import { StatusCodes } from 'http-status-codes';
+import { MediaService } from 'src/media/media.service';
 
 @Injectable()
 export class DiaryService {
@@ -12,6 +13,7 @@ export class DiaryService {
     private readonly userService: UserService,
     @InjectRepository(Diary)
     private readonly diaryRepository: Repository<Diary>,
+    private readonly mediaService: MediaService,
   ) {}
 
   /*
@@ -53,7 +55,11 @@ export class DiaryService {
       .getMany();
   }
 
-  async postDiary(id: string, diaryDto: DiaryDto) {
+  async postDiary(
+    id: string,
+    diaryDto: DiaryDto,
+    files: { photos?: Express.Multer.File[] },
+  ) {
     const sender = await this.userService.findUser(id);
     const receiver = await this.userService.findUser(diaryDto.receiverID);
 
@@ -61,20 +67,40 @@ export class DiaryService {
       return StatusCodes.NOT_FOUND;
     }
 
-    const diary = this.diaryRepository.create({
-      title: diaryDto.title,
-      message: diaryDto.message,
-      sender,
-      receiver,
-    });
+    const queryRunner =
+      this.diaryRepository.manager.connection.createQueryRunner();
+    await queryRunner.startTransaction();
 
-    if (diaryDto.location) {
-      diary.location = diaryDto.location;
+    try {
+      const diary = this.diaryRepository.create({
+        title: diaryDto.title,
+        message: diaryDto.message,
+        sender,
+        receiver,
+      });
+
+      if (diaryDto.location) {
+        diary.location = diaryDto.location;
+      }
+
+      await queryRunner.manager.save(Diary, diary);
+
+      //사진 추가하는 메서드 작성 후 추가 예정
+      const photos = await this.mediaService.uploadDiaryPhotos(
+        files.photos,
+        diary,
+        queryRunner,
+      );
+      console.debug(photos);
+      await queryRunner.commitTransaction();
+
+      return StatusCodes.OK;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
     }
-
-    await this.diaryRepository.save(diary);
-
-    return StatusCodes.OK;
   }
 
   async searchDiary(id: string, search: string) {

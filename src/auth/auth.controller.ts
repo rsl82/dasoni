@@ -52,7 +52,7 @@ export class AuthController {
 
     const response = new SuccessResponseDto(true, 'Login Success');
 
-    return res.status(StatusCodes.OK).json(response);
+    return res.redirect('http://localhost:3000/login/success');
   }
 
   @Get('/refresh')
