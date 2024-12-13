@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -12,12 +13,13 @@ import { JwtToID } from 'src/util/decorators/jwt-to-id.decorator';
 import { FriendService } from './friend.service';
 import { Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
+import { ResponseDto } from 'src/util/dto/response.dto';
 
 @Controller('friend')
 @UseGuards(AuthGuard('jwt'))
 export class FriendController {
   constructor(private readonly friendService: FriendService) {}
+
   @Post()
   async sendFriendRequest(
     @JwtToID() senderID: string,
@@ -26,9 +28,8 @@ export class FriendController {
   ) {
     try {
       await this.friendService.sendFriendRequest(senderID, receiverID);
-      res
-        .status(StatusCodes.OK)
-        .json(new SuccessResponseDto(true, 'Request Sent'));
+      const response = new ResponseDto('Request Sent');
+      return res.status(StatusCodes.OK).json(response);
     } catch (error) {}
   }
 
@@ -40,10 +41,16 @@ export class FriendController {
   ) {
     try {
       await this.friendService.responseFriendRequest(requestID, decision);
-      return res
-        .status(StatusCodes.OK)
-        .json(new SuccessResponseDto(true, 'Update Success'));
-    } catch {}
+      const response = new ResponseDto('Update Success');
+      return res.status(StatusCodes.OK).json(response);
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        const response = new ResponseDto('Bad Request');
+        return res.status(StatusCodes.BAD_REQUEST).json(response);
+      }
+      const response = new ResponseDto('Server Error');
+      return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(response);
+    }
   }
 
   @Delete()
@@ -52,15 +59,13 @@ export class FriendController {
     @Body('friendID') friendID: string,
     @Res() res: Response,
   ) {
-    const result = await this.friendService.deleteFriend(userID, friendID);
-    if (!result) {
-      return res
-        .status(StatusCodes.NOT_FOUND)
-        .json(new SuccessResponseDto(false, 'No Friend Matched'));
+    try {
+      await this.friendService.deleteFriend(userID, friendID);
+      const response = new ResponseDto('Success Deletion');
+      return res.status(StatusCodes.OK).json(response);
+    } catch (error) {
+      const response = new ResponseDto('No Friend Matched');
+      return res.status(StatusCodes.NOT_FOUND).json(response);
     }
-
-    return res
-      .status(StatusCodes.OK)
-      .json(new SuccessResponseDto(true, 'Success Deletion'));
   }
 }

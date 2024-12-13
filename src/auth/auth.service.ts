@@ -38,6 +38,7 @@ export class AuthService {
     return refreshToken;
   }
 
+  //refreshToken hash해서 저장하는 과정
   async hashAndSetRefreshToken(
     id: string,
     refreshToken: string,
@@ -73,6 +74,7 @@ export class AuthService {
       if (!matchingRefreshToken) {
         throw new Error('Not Matching Token');
       }
+
       return await this.generateTokens(id);
     } catch (error) {
       console.debug('Error in refreshTokens logic.');

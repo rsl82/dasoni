@@ -1,10 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { QueryRunner, Repository } from 'typeorm';
 import { Notification } from './notification.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserService } from 'src/user/user.service';
 import { NotiType } from 'src/util/enum/type.enum';
-import { query } from 'express';
 
 @Injectable()
 export class NotificationService {
@@ -18,7 +17,10 @@ export class NotificationService {
     const result = await this.notiRepository.find({
       where: { receiver: { id }, readAt: null },
     });
-    console.debug(result);
+
+    if (!result) {
+      throw new NotFoundException();
+    }
     return result;
   }
 
@@ -27,7 +29,13 @@ export class NotificationService {
   }
 
   async readNotification(id: string) {
-    return await this.notiRepository.update({ id }, { readAt: new Date() });
+    const result = await this.notiRepository.update(
+      { id, readAt: null },
+      { readAt: new Date() },
+    );
+    if (result.affected === 0) {
+      throw new NotFoundException();
+    }
   }
 
   async createFriendNotification(

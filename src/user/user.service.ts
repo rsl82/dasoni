@@ -1,19 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entity/user.entity';
 import { QueryFailedError, Repository } from 'typeorm';
 import { KakaoUser } from './entity/kakao.entity';
 import { socialUserDto } from '../util/dto/social-user.dto';
 import { NameDto } from './dto/name-update.dto';
-import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
-import { StatusCodes } from 'http-status-codes';
-import { MediaDto } from 'src/util/dto/media.dto';
-import { NotiType } from 'src/util/enum/type.enum';
-import { v4 as uuidv4 } from 'uuid';
 import { MediaService } from 'src/media/media.service';
-import * as mime from 'mime-types';
-import { query } from 'express';
-
 
 @Injectable()
 export class UserService {
@@ -72,7 +69,7 @@ export class UserService {
   async findUserByName(name: string) {
     const user = await this.userRepository.findOne({ where: { name } });
     if (!user) {
-      return null;
+      throw new NotFoundException();
     }
 
     return user.id;
@@ -81,12 +78,11 @@ export class UserService {
   async updateName(id: string, nameUpdateDto: NameDto) {
     try {
       await this.userRepository.update({ id }, { name: nameUpdateDto.name });
-      return StatusCodes.OK;
     } catch (error) {
       if (error instanceof QueryFailedError) {
-        return StatusCodes.CONFLICT;
+        throw new ConflictException();
       }
-      return StatusCodes.INTERNAL_SERVER_ERROR;
+      throw new InternalServerErrorException();
     }
   }
 
@@ -103,7 +99,6 @@ export class UserService {
       throw error;
     } finally {
       await queryRunner.release();
-
     }
   }
 }

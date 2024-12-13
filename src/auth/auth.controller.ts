@@ -1,18 +1,10 @@
-import {
-  Controller,
-  Get,
-  Req,
-  Res,
-  UnauthorizedException,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from '@nestjs/passport';
 import { UserInfo } from '../util/decorators/user-info.decorator';
 import { Request, Response } from 'express';
 import { socialUserDto } from '../util/dto/social-user.dto';
-import { JwtToID } from '../util/decorators/jwt-to-id.decorator';
-import { SuccessResponseDto } from 'src/util/dto/success-response.dto';
+import { ResponseDto } from 'src/util/dto/response.dto';
 import { StatusCodes } from 'http-status-codes';
 
 @Controller('auth')
@@ -51,8 +43,6 @@ export class AuthController {
     console.debug(`accessToken: ${accessToken}`);
     console.debug(`refreshToken: ${refreshToken}`);
 
-    const response = new SuccessResponseDto(true, 'Login Success');
-
     return res.redirect(
       `http://localhost:3000/login/success?token=${accessToken}`,
     );
@@ -73,20 +63,13 @@ export class AuthController {
         maxAge: 3 * 24 * 60 * 60 * 1000,
       });
 
-      const response = new SuccessResponseDto(true, 'Refresh Success');
-
+      const response = new ResponseDto('Refresh Success', {
+        token: accessToken,
+      });
       return res.status(StatusCodes.OK).json(response);
     } catch (error) {
-      //res.clearCookie('refreshToken');
-      const response = new SuccessResponseDto(false, 'Unauthorized');
+      const response = new ResponseDto('Unauthorized');
       return res.status(StatusCodes.UNAUTHORIZED).json(response);
     }
-  }
-
-  @Get('/test')
-  @UseGuards(AuthGuard('jwt'))
-  test(@JwtToID() id: string) {
-    console.debug(id);
-    return 'success';
   }
 }

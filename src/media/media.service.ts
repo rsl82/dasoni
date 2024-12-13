@@ -1,16 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { MediaDto } from '../util/dto/media.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Media } from './media.entity';
 import { QueryRunner, Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import * as mime from 'mime-types';
 import { Diary } from 'src/diary/diary.entity';
-import { Query } from 'typeorm/driver/Query';
-import { query } from 'express';
-
 
 @Injectable()
 export class MediaService {
@@ -38,7 +34,6 @@ export class MediaService {
     const mediaID = uuidv4();
     const ext = mime.extension(file.mimetype);
     const fileName = `${mediaID}.${ext}`;
-
 
     const uploader = new PutObjectCommand({
       Bucket: this.configService.get<string>('S3_BUCKET_NAME'),
@@ -80,6 +75,5 @@ export class MediaService {
     );
 
     return photos;
-
   }
 }

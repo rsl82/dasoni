@@ -1,9 +1,7 @@
 import { User } from 'src/user/entity/user.entity';
 import {
-  Check,
   CreateDateColumn,
   Entity,
-  Index,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
