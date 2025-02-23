@@ -2,12 +2,15 @@ name: CICD
 
 on:
   pull_request:
+    types:
+      - closed
     branches: 
       - develop
 
 jobs:
   build:
     runs-on: ubuntu-24.04
+    if: github.event.pull_request.merged == true
 
     steps:
       - name: Checkout Code
