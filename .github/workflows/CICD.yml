@@ -7,10 +7,22 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker Image
+        run: docker build -t dasoni-back
+
+      - name: Run Test
+
+      - name: Push image to Hub
+        run: |
+          echo ${{ secrets.DOCKER_PASSWORD }} | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker tag dasoni-back ${{ secrets.DOCKER_USERNAME }}/dasoni-back:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/dasoni-back:latest
