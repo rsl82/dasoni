@@ -44,6 +44,7 @@ services:
 volumes:
   redis: {}
 
+
 networks:
   default:
     name: dasoni-network

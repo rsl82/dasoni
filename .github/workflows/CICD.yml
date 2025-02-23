@@ -29,7 +29,7 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/dasoni-back:latest
 
   deploy:
-
+    needs: build
     runs-on: self-hosted
 
     steps:
