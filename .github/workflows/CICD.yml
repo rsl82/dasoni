@@ -19,8 +19,6 @@ jobs:
       - name: Build Docker Image
         run: docker build -t dasoni-back
 
-      - name: Run Test
-
       - name: Push image to Hub
         run: |
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
