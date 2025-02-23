@@ -1,4 +1,4 @@
-name: CI
+name: CICD
 
 on:
   pull_request:
@@ -27,3 +27,20 @@ jobs:
           echo ${{ secrets.DOCKER_PASSWORD }} | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
           docker tag dasoni-back ${{ secrets.DOCKER_USERNAME }}/dasoni-back:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/dasoni-back:latest
+
+  deploy:
+
+    runs-on: self-hosted
+
+    steps:
+      - name: Pull docker image
+        run: docker pull rsl82/dasoni-back:latest
+
+      - name: Stop old container
+        run: docker compose down
+
+      - name: Start container with new image
+        run: docker compose up -d 
+
+      - name: Delete old images
+        run: docker image prune -f -a
