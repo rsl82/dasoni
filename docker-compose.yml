@@ -2,8 +2,7 @@ version: '3.8'
 
 services:
   app:
-    build: .
-    container_name: dasoni-api
+    image: rsl82/dasoni-back
     ports:
       - '${PORT:-3000}:3000'
     environment:
