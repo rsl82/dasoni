@@ -11,6 +11,7 @@ import { UtilModule } from './util/util.module';
 import { DiaryModule } from './diary/diary.module';
 import { NotificationModule } from './notification/notification.module';
 import { FriendModule } from './friend/friend.module';
+import { SseModule } from './sse/sse.module';
 
 
 @Module({
@@ -27,6 +28,7 @@ import { FriendModule } from './friend/friend.module';
     DiaryModule,
     NotificationModule,
     FriendModule,
+    SseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
