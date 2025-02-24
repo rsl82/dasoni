@@ -20,7 +20,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build Docker Image
-        run: docker build -t dasoni-back .
+        run: docker build -t ${{ secrets.PROJECT_NAME }} .
 
       - name: Push image to Hub
         run: |
